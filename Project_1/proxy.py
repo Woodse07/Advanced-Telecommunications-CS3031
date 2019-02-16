@@ -10,6 +10,51 @@ DEBUG = True			# Set true if you want to see debug messages.
 def main():
 	# Check for relevant arguments..
 	try:
+		option = int(raw_input("[*] Press 1 to continue with Proxy\n[*] Press 2 to edit URL blacklist.\n[*] "))
+
+
+		if option == 2:
+			file = open("blacklist.txt", "w")
+			file = open("blacklist.txt", "r")
+			print("Current entries in blacklist: ")
+			for line in file:
+				print(line)
+			print("\n")
+			while True:
+				option = int(raw_input("[*] Press 1 to add an entry.\n[*] Press 2 to remove an entry.\n[*] Press 3 to exit and continue with Proxy.\n[*] Press 4 to view what websites are on the blacklist.\n[*] "))
+				if option == 4:
+					file = open("blacklist.txt", "r")
+					print("Current entries in blacklist: ")
+					for line in file:
+						print(line)
+					print("\n")
+				if option == 3:
+					break
+				if option == 2:
+					file = open("blacklist.txt", "r")	
+					name = str(raw_input("[*] Please enter the name of the website you would like to remove from the list..\n[*] "))
+					name = name + "\n"
+					temp = []
+					for line in file:
+						temp.append(line)
+					if name not in temp:
+						print("Website is not in the blacklist.")
+					else:	
+						temp.remove(name)
+						file = open("blacklist.txt", "w")
+						for line in temp:
+							file.write(line)
+						print("[*] Removed " + name + " from blacklist..") 
+			
+				if option == 1:
+					file = open("blacklist.txt", "a")
+					name = str(raw_input("[*] Please enter the name of the website you would like to block.. (Not the url, just the name (e.g.) google)\n[*] "))
+					file.write(name + "\n")
+					file.close()
+
+
+
+
 		listening_port = int(raw_input("[*] Enter Listening Port Number: "))
 	except KeyboardInterrupt:
 		print("\n[*] User Requested An Interrupt")
@@ -30,6 +75,7 @@ def main():
 		try:
 			conn, client_addr = s.accept()		# Accept connection from client browser
 			data = conn.recv(MAX_DATA_RECV)		# Receive client data
+			cache = {}
 			thread.start_new_thread(proxy_thread, (conn, data, client_addr))	# Start a thread
 		except KeyboardInterrupt:
 			s.close()
@@ -81,7 +127,22 @@ def proxy_thread(conn, data, client_addr):
 	
 
 def proxy_server(webserver, port, conn, client_addr, data, method):
+
+	if webserver in cache:
+		print("here")
+		conn.send(cache[webserver])
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	print("webserver: " + webserver)
+	print("data: " + data)
+	file = open("blacklist.txt", "r")
+	for line in file:
+		print(line[:-1])
+		print(webserver)
+		if line[:-1] in webserver:
+			conn.close()
+			return
+
 	if method == "CONNECT":
 		try:
 			s.connect((webserver, port))
@@ -113,6 +174,7 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 			while True:
 				reply = s.recv(MAX_DATA_RECV)
 				if (len(reply) > 0):
+					#cache[webserver] = reply
 					conn.send(reply)		# Send reply back to client
 				else:
 					break
