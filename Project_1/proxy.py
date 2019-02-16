@@ -5,7 +5,7 @@ import os, sys, thread, socket, ssl, requests
 BACKLOG = 50 			# How many pending connection will the queue hold?	
 MAX_DATA_RECV = 4096	# Max number of bytes to receive at once?
 DEBUG = True			# Set true if you want to see debug messages. 
-
+cache = {}
 # MAIN PROGRAM
 def main():
 	# Check for relevant arguments..
@@ -75,7 +75,6 @@ def main():
 		try:
 			conn, client_addr = s.accept()		# Accept connection from client browser
 			data = conn.recv(MAX_DATA_RECV)		# Receive client data
-			cache = {}
 			thread.start_new_thread(proxy_thread, (conn, data, client_addr))	# Start a thread
 		except KeyboardInterrupt:
 			s.close()
@@ -88,6 +87,7 @@ def main():
 
 def proxy_thread(conn, data, client_addr):
 	print("[*] Starting new thread...")
+	#print("Cache: " + str(cache))
 	try:
 		first_line = data.split('\n')[0]
 		url = first_line.split(' ')[1]
@@ -120,25 +120,22 @@ def proxy_thread(conn, data, client_addr):
 		else:												# Specific port..
 			port = int((temp[(port_pos+1):])[:webserver_pos-port_pos-1])
 			webserver = temp[:port_pos]
-		
-		proxy_server(webserver, port, conn, client_addr, data, method)
+
+		if webserver in cache:
+			print("here")
+			print(cache[webserver])
+			conn.send(cache[webserver])
+		else:
+			proxy_server(webserver, port, conn, client_addr, data, method)
 	except Exception, e:
 		pass
 	
 
 def proxy_server(webserver, port, conn, client_addr, data, method):
 
-	if webserver in cache:
-		print("here")
-		conn.send(cache[webserver])
-
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	print("webserver: " + webserver)
-	print("data: " + data)
 	file = open("blacklist.txt", "r")
 	for line in file:
-		print(line[:-1])
-		print(webserver)
 		if line[:-1] in webserver:
 			conn.close()
 			return
@@ -174,12 +171,12 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 			while True:
 				reply = s.recv(MAX_DATA_RECV)
 				if (len(reply) > 0):
-					#cache[webserver] = reply
 					conn.send(reply)		# Send reply back to client
 				else:
 					break
 			s.close()			# Close server socket
 			conn.close()		# Close client socket
+			cache[webserver] = reply
 		except Exception, e:
 			s.close()
 			conn.close()
