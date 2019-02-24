@@ -22,7 +22,6 @@ def tkinter():
 		temp = blocked.get(ret)
 		if temp is None:
 			blocked[ret] = 1	
-			print(cache)
 			print("[*] Successfully blocked: " + ret)
 		else:
 			print("[*] This website is already blocked..")
@@ -111,7 +110,12 @@ def proxy_thread(conn, data, client_addr):
 			port = int((temp[(port_pos+1):])[:webserver_pos-port_pos-1])
 			webserver = temp[:port_pos]
 
-		proxy_server(webserver, port, conn, client_addr, data, method)
+		x = cache.get(webserver)
+		if x is not None:
+			print("In Cache!!")
+			conn.sendall(x)
+		else:
+			proxy_server(webserver, port, conn, client_addr, data, method)
 	except Exception, e:
 		pass
 	
@@ -150,35 +154,29 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 				pass
 	else:
 
-		temp = cache.get(wesberver)
-		if temp is not none:
-			print("Found in cache!")
-			conn.sendall(cache.get(webserver))
-		else:
-			try:
-				s.connect((webserver, port))
-				s.send(data)
+		#temp = cache.get(wesberver)
+		#if temp is not none:
+		#	print("Found in cache!")
+		#	conn.sendall(cache.get(webserver))
+		#else:
+		string_builder = bytearray("", 'utf-8')
+		s.connect((webserver, port))
+		s.send(data)
+		try:
+			while True:
+				reply = s.recv(MAX_DATA_RECV)
+				if (len(reply) > 0):
+					conn.send(reply)		# Send reply back to client
+					string_builder.extend(reply)
+				else:
+					break
+		except socket.error:
+			pass
 
-				string_builder = bytearray("", 'utf-8')
-
-				while True:
-					reply = s.recv(MAX_DATA_RECV)
-					if (len(reply) > 0):
-						conn.send(reply)		# Send reply back to client
-						string_builder.extend(reply)
-					else:
-						break
-				
-				cache[webserver] = string_builder
-				print("Added to cache: " + cache[webserver])
-
-				s.close()			# Close server socket
-				conn.close()		# Close client socket
-			except Exception, e:
-				s.close()
-				conn.close()
-				print("Runtime Error: " + e)	
-				sys.exit(1)
+		cache[webserver] = string_builder
+		print("Added to cache: " + cache[webserver])
+		s.close()			# Close server socket
+		conn.close()		# Close client socket
 
 
 if __name__ == '__main__':
