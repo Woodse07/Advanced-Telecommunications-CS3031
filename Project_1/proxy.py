@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import os, sys, thread, socket, ssl, requests
+import os, sys, thread, socket
 import Tkinter as tk
 from Tkinter import *
 
@@ -7,9 +7,12 @@ from Tkinter import *
 BACKLOG = 50 			# How many pending connection will the queue hold?	
 MAX_DATA_RECV = 4096	# Max number of bytes to receive at once?
 DEBUG = True			# Set true if you want to see debug messages. 
-blocked = {}
-cache = {}
+blocked = {}			# Dict to store the blocked URLs
+cache = {}				# Dict to act as a cache, stores responses.
 
+# Tkinter function.. Used to dynamicall block URLs.
+# Also used to display the current blocked URLs and the cache.
+#
 def tkinter():
 	console = tk.Tk()
 	block = Entry(console)
@@ -167,6 +170,7 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 		string_builder = bytearray("", 'utf-8')
 		s.connect((webserver, port))
 		s.send(data)
+		s.settimeout(2)
 		try:
 			while True:
 				reply = s.recv(MAX_DATA_RECV)
@@ -178,7 +182,7 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 		except socket.error:
 			pass
 		cache[webserver] = string_builder
-		print("[*] Added to cache: " + webserver)
+		print("[*] Added to cache: " + webserver + "\n" + cache[webserver])
 		s.close()			# Close server socket
 		conn.close()		# Close client socket
 
