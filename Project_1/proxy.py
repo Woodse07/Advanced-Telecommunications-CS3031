@@ -12,14 +12,16 @@ cache = {}				# Dict to act as a cache, stores responses.
 
 # Tkinter function.. Used to dynamicall block URLs.
 # Also used to display the current blocked URLs and the cache.
-#
 def tkinter():
+	# Create block and unblock entries.. 
 	console = tk.Tk()
 	block = Entry(console)
 	block.grid(row=0,column=0)
 	unblock = Entry(console)
 	unblock.grid(row=1, column=0)
 
+	# Function for blocking urls.. basically take whats in the entry cell and put it into 
+	# the dict..
 	def block_url():
 		ret = block.get()
 		temp = blocked.get(ret)
@@ -28,9 +30,12 @@ def tkinter():
 			print("[*] Successfully blocked: " + ret)
 		else:
 			print("[*] This website is already blocked..")
+	# Creating a button to call the block_url function..
 	block_button = Button(console, text="Block URL", command=block_url)
 	block_button.grid(row=0, column=1)
 
+	# Function for unblocking urls.. basically tkaes whats in the entry cell and removes it
+	# from the blocked dict if it exists..
 	def unblock_url():
 		ret = unblock.get()
 		temp = blocked.get(ret)
@@ -39,29 +44,37 @@ def tkinter():
 		else:
 			blocked.pop(ret)
 			print("[*] Successfully unblocked: " + ret)
+	# Creating a button to call the unblock_url function..
 	unblock_button = Button(console, text="Unlock URL", command=unblock_url)
 	unblock_button.grid(row=1, column=1)
 	
+	# Function to print all currently blocked urls..
 	def print_blocked():
 		print(blocked)
 	print_blocked = Button(console, text="Print Blocked URLs", command=print_blocked)
 	print_blocked.grid(row=3, column=0)
 
+	# Function to print all currently cached pages..
 	def print_cache():
 		for key, value in cache.iteritems():
 			print key
 	print_blocked = Button(console, text="Print Cache", command=print_cache)
 	print_blocked.grid(row=3, column=1)
 
+	# Could add other functionality here :D	
+
 	mainloop()
 	
 # MAIN PROGRAM
 def main():
-	# Check for relevant arguments..
+	# Run a thread of our tkinter function..
 	thread.start_new_thread(tkinter,())
+
 	try:
+		# Ask user what port they'd like to run the proxy on..
 		listening_port = int(raw_input("[*] Enter Listening Port Number: "))
 	except KeyboardInterrupt:
+		# Handling keyboard interrupt.. looks nicer..
 		print("\n[*] User Requested An Interrupt")
 		print("[*] Application Exiting...")
 		sys.exit()
@@ -80,7 +93,7 @@ def main():
 		try:
 			conn, client_addr = s.accept()		# Accept connection from client browser
 			data = conn.recv(MAX_DATA_RECV)		# Receive client data
-			thread.start_new_thread(proxy_thread, (conn, data, client_addr))	# Start a thread
+			thread.start_new_thread(proxy_thread, (conn, data, client_addr)) # Start a thread
 		except KeyboardInterrupt:
 			s.close()
 			print("[*] Proxy server shutting down...")
@@ -93,6 +106,7 @@ def proxy_thread(conn, data, client_addr):
 	print("")
 	print("[*] Starting new thread...")
 	try:
+		# Parsing the request..
 		first_line = data.split('\n')[0]
 		url = first_line.split(' ')[1]
 		method = first_line.split(' ')[0]
@@ -121,28 +135,35 @@ def proxy_thread(conn, data, client_addr):
 			port = int((temp[(port_pos+1):])[:webserver_pos-port_pos-1])
 			webserver = temp[:port_pos]
 
+		# Checking if we already have the response in our cache..
 		x = cache.get(webserver)
 		if x is not None:
+			# If we do, don't bother with proxy_server function and send the response on..
 			print("[*] Found in Cache!")
 			print("[*] Sending cached result to user..")
 			conn.sendall(x)
 		else:
+			# If we don't, continue..
 			proxy_server(webserver, port, conn, client_addr, data, method)
 	except Exception, e:
 		pass
 	
 
 def proxy_server(webserver, port, conn, client_addr, data, method):
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Initiating socket..
+	
+	# Checking our blocked dict to check if the URL the user is trying to connect to 
+	# is blocked..
 	for key, value in blocked.iteritems():
 		if key in webserver and value is 1:
 			print("That url is blocked!")
 			conn.close()
 			return
 
-
+	# If the method is CONNECT, we know this is HTTPS.
 	if method == "CONNECT":
 		try:
+			# Connect to the webserver..
 			s.connect((webserver, port))
 			reply = "HTTP/1.0 200 Connection established\r\n"
 			reply += "Proxy-agent: Pyx\r\n"
@@ -153,6 +174,7 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 			return
 		conn.setblocking(0)
 		s.setblocking(0)
+		# Bidirectional messages here.. (Websocket connection)
 		while True:
 			try:
 				request = conn.recv(MAX_DATA_RECV)
@@ -165,8 +187,9 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 			except socket.error as err:
 				pass
 
-
+	# Else we know this is HTTP.
 	else:
+		# String builder to build response for our cache.
 		string_builder = bytearray("", 'utf-8')
 		s.connect((webserver, port))
 		s.send(data)
@@ -181,6 +204,7 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 					break
 		except socket.error:
 			pass
+		# After response is complete, we can store this in cache. 
 		cache[webserver] = string_builder
 		print("[*] Added to cache: " + webserver + "\n" + cache[webserver])
 		s.close()			# Close server socket
