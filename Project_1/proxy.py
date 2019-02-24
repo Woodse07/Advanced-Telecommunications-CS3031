@@ -1,60 +1,51 @@
 #! /usr/bin/env python
 import os, sys, thread, socket, ssl, requests
+import Tkinter as tk
+from Tkinter import *
 
 # CONSTANTS
 BACKLOG = 50 			# How many pending connection will the queue hold?	
 MAX_DATA_RECV = 4096	# Max number of bytes to receive at once?
 DEBUG = True			# Set true if you want to see debug messages. 
+blocked = {}
 cache = {}
+
+def tkinter():
+	console = tk.Tk()
+	block = Entry(console)
+	block.grid(row=0,column=0)
+	unblock = Entry(console)
+	unblock.grid(row=1, column=0)
+
+	def block_url():
+		ret = block.get()
+		temp = blocked.get(ret)
+		if temp is None:
+			blocked[ret] = 1	
+			print(cache)
+			print("[*] Successfully blocked: " + ret)
+		else:
+			print("[*] This website is already blocked..")
+	block_button = Button(console, text="Block URL", command=block_url)
+	block_button.grid(row=0, column=1)
+
+	def unblock_url():
+		ret = unblock.get()
+		temp = blocked.get(ret)
+		if temp is None:
+			print("[*] Url is not blocked: " + ret)
+		else:
+			blocked.pop(ret)
+			print("[*] Successfully unblocked: " + ret)
+	unblock_button = Button(console, text="Unlock URL", command=unblock_url)
+	unblock_button.grid(row=1, column=1)
+	mainloop()
+	
 # MAIN PROGRAM
 def main():
 	# Check for relevant arguments..
+	thread.start_new_thread(tkinter,())
 	try:
-		option = int(raw_input("[*] Press 1 to continue with Proxy\n[*] Press 2 to edit URL blacklist.\n[*] "))
-
-
-		if option == 2:
-			file = open("blacklist.txt", "w")
-			file = open("blacklist.txt", "r")
-			print("Current entries in blacklist: ")
-			for line in file:
-				print(line)
-			print("\n")
-			while True:
-				option = int(raw_input("[*] Press 1 to add an entry.\n[*] Press 2 to remove an entry.\n[*] Press 3 to exit and continue with Proxy.\n[*] Press 4 to view what websites are on the blacklist.\n[*] "))
-				if option == 4:
-					file = open("blacklist.txt", "r")
-					print("Current entries in blacklist: ")
-					for line in file:
-						print(line)
-					print("\n")
-				if option == 3:
-					break
-				if option == 2:
-					file = open("blacklist.txt", "r")	
-					name = str(raw_input("[*] Please enter the name of the website you would like to remove from the list..\n[*] "))
-					name = name + "\n"
-					temp = []
-					for line in file:
-						temp.append(line)
-					if name not in temp:
-						print("Website is not in the blacklist.")
-					else:	
-						temp.remove(name)
-						file = open("blacklist.txt", "w")
-						for line in temp:
-							file.write(line)
-						print("[*] Removed " + name + " from blacklist..") 
-			
-				if option == 1:
-					file = open("blacklist.txt", "a")
-					name = str(raw_input("[*] Please enter the name of the website you would like to block.. (Not the url, just the name (e.g.) google)\n[*] "))
-					file.write(name + "\n")
-					file.close()
-
-
-
-
 		listening_port = int(raw_input("[*] Enter Listening Port Number: "))
 	except KeyboardInterrupt:
 		print("\n[*] User Requested An Interrupt")
@@ -87,7 +78,6 @@ def main():
 
 def proxy_thread(conn, data, client_addr):
 	print("[*] Starting new thread...")
-	#print("Cache: " + str(cache))
 	try:
 		first_line = data.split('\n')[0]
 		url = first_line.split(' ')[1]
@@ -121,12 +111,7 @@ def proxy_thread(conn, data, client_addr):
 			port = int((temp[(port_pos+1):])[:webserver_pos-port_pos-1])
 			webserver = temp[:port_pos]
 
-		if webserver in cache:
-			print("here")
-			print(cache[webserver])
-			conn.send(cache[webserver])
-		else:
-			proxy_server(webserver, port, conn, client_addr, data, method)
+		proxy_server(webserver, port, conn, client_addr, data, method)
 	except Exception, e:
 		pass
 	
@@ -134,9 +119,9 @@ def proxy_thread(conn, data, client_addr):
 def proxy_server(webserver, port, conn, client_addr, data, method):
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	file = open("blacklist.txt", "r")
-	for line in file:
-		if line[:-1] in webserver:
+	for key, value in blocked.iteritems():
+		if key in webserver and value is 1:
+			print("That url is blocked!")
 			conn.close()
 			return
 
@@ -164,24 +149,36 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 			except socket.error as err:
 				pass
 	else:
-		try:
-			s.connect((webserver, port))
-			s.send(data)
 
-			while True:
-				reply = s.recv(MAX_DATA_RECV)
-				if (len(reply) > 0):
-					conn.send(reply)		# Send reply back to client
-				else:
-					break
-			s.close()			# Close server socket
-			conn.close()		# Close client socket
-			cache[webserver] = reply
-		except Exception, e:
-			s.close()
-			conn.close()
-			print("Runtime Error: " + e)	
-			sys.exit(1)
+		temp = cache.get(wesberver)
+		if temp is not none:
+			print("Found in cache!")
+			conn.sendall(cache.get(webserver))
+		else:
+			try:
+				s.connect((webserver, port))
+				s.send(data)
+
+				string_builder = bytearray("", 'utf-8')
+
+				while True:
+					reply = s.recv(MAX_DATA_RECV)
+					if (len(reply) > 0):
+						conn.send(reply)		# Send reply back to client
+						string_builder.extend(reply)
+					else:
+						break
+				
+				cache[webserver] = string_builder
+				print("Added to cache: " + cache[webserver])
+
+				s.close()			# Close server socket
+				conn.close()		# Close client socket
+			except Exception, e:
+				s.close()
+				conn.close()
+				print("Runtime Error: " + e)	
+				sys.exit(1)
 
 
 if __name__ == '__main__':
