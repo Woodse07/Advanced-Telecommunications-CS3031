@@ -38,6 +38,18 @@ def tkinter():
 			print("[*] Successfully unblocked: " + ret)
 	unblock_button = Button(console, text="Unlock URL", command=unblock_url)
 	unblock_button.grid(row=1, column=1)
+	
+	def print_blocked():
+		print(blocked)
+	print_blocked = Button(console, text="Print Blocked URLs", command=print_blocked)
+	print_blocked.grid(row=3, column=0)
+
+	def print_cache():
+		for key, value in cache.iteritems():
+			print key
+	print_blocked = Button(console, text="Print Cache", command=print_cache)
+	print_blocked.grid(row=3, column=1)
+
 	mainloop()
 	
 # MAIN PROGRAM
@@ -74,8 +86,8 @@ def main():
 
 
 
-
 def proxy_thread(conn, data, client_addr):
+	print("")
 	print("[*] Starting new thread...")
 	try:
 		first_line = data.split('\n')[0]
@@ -83,12 +95,8 @@ def proxy_thread(conn, data, client_addr):
 		method = first_line.split(' ')[0]
 		print("[*] Connecting to url " + url)
 		print("[*] Method: " + method)
-
 		if (DEBUG):
-			print(first_line)
-			print("")
-			print("URL: " + url)
-			print("")
+			print("[*] URL: " + url)
 
 		http_pos = url.find("://")		# Find pos of ://
 		if (http_pos == -1):
@@ -112,7 +120,8 @@ def proxy_thread(conn, data, client_addr):
 
 		x = cache.get(webserver)
 		if x is not None:
-			print("In Cache!!")
+			print("[*] Found in Cache!")
+			print("[*] Sending cached result to user..")
 			conn.sendall(x)
 		else:
 			proxy_server(webserver, port, conn, client_addr, data, method)
@@ -121,13 +130,13 @@ def proxy_thread(conn, data, client_addr):
 	
 
 def proxy_server(webserver, port, conn, client_addr, data, method):
-
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	for key, value in blocked.iteritems():
 		if key in webserver and value is 1:
 			print("That url is blocked!")
 			conn.close()
 			return
+
 
 	if method == "CONNECT":
 		try:
@@ -152,13 +161,9 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 				conn.sendall(reply)
 			except socket.error as err:
 				pass
-	else:
 
-		#temp = cache.get(wesberver)
-		#if temp is not none:
-		#	print("Found in cache!")
-		#	conn.sendall(cache.get(webserver))
-		#else:
+
+	else:
 		string_builder = bytearray("", 'utf-8')
 		s.connect((webserver, port))
 		s.send(data)
@@ -172,9 +177,8 @@ def proxy_server(webserver, port, conn, client_addr, data, method):
 					break
 		except socket.error:
 			pass
-
 		cache[webserver] = string_builder
-		print("Added to cache: " + cache[webserver])
+		print("[*] Added to cache: " + webserver)
 		s.close()			# Close server socket
 		conn.close()		# Close client socket
 
