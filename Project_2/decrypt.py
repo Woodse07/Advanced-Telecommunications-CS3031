@@ -1,13 +1,11 @@
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 from cryptography.fernet import Fernet
-import os
 
-file = open("keys/symmetric_key.txt", "r")
-key = file.read()
-f = Fernet(key)
-
-for filename in os.listdir("secret_files"):
-	file = open("secret_files/" + filename, "r")
-	data = file.read()
-	encrypted = f.decrypt(data)	
-	file2 = open("secret_files/" + filename, "w")
-	file2.write(encrypted)
+def decrypt(f, file_list):
+	for file in file_list:
+		encoded = file.GetContentString()
+		print("[*] Decrypting file: " + file['title'] + "...")
+		decoded = f.decrypt(encoded.encode())
+		file.SetContentString(decoded.decode())
+		file.Upload()
