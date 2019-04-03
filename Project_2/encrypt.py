@@ -4,8 +4,8 @@ from cryptography.fernet import Fernet
 
 def encrypt(f, file_list):
 	for file in file_list:
-		unencoded = file.GetContentString()
 		print("[*] Encrypting file: " + file['title'] + "...")
+		unencoded = file.GetContentString()
 		encoded = f.encrypt(unencoded.encode())
 		file.SetContentString(encoded.decode())
 		file.Upload()
