@@ -1,0 +1,17 @@
+Only people part of my 'group' can decrypt my files..
+To all other users files will be encrypted..
+Add or remove users..
+Asymmetric public key for every user.. used to encrypt a symmetric key..
+Symmetric key used to encrypt/decrypt all files..
+User can then decrypt their encrypted version of symmetric key..
+Can then encrypt/decrypt with their symmetric key..
+
+If user is added:
+	1. Create new asymmetric key pair.
+	2. Encrypt symmetric key with public asymmetric key.
+	3. Give user Encrypted symmetric key and their private key.
+	
+If user is removed:
+	1. Generate a new symmetric key.
+	2. Re-encrypt all files.
+	3. Re-encyrpt symmetric key for each user. 
