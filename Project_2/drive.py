@@ -10,7 +10,13 @@ import os
 import shutil
 
 def main():
-	print("[*] Welcome to secure cloud storage application!")
+	print("   _____        _____        _____                 ")
+	print("  / ____|      / ____|      / ____|         /\     ")
+	print(" | (___       | |          | (___          /  \    ")
+	print("  \___ \      | |           \___ \        / /\ \   ")
+	print("  ____) |  _  | |____   _   ____) |  _   / ____ \  ")
+	print(" |_____/  (_)  \_____| (_) |_____/  (_) /_/    \_\ ")
+	print("[*] Welcome to secure cloud storage application!(Server side)")
 	auth = GoogleAuth()
 	auth.LocalWebserverAuth()
 	drive = GoogleDrive(auth) 
@@ -31,7 +37,7 @@ def main():
 	finished = False
 	while not finished:
 		print("[*]")
-		option = input("[*] Enter 1 to encrypt files.\n[*] Enter 2 to decrypt files.\n[*] Enter 3 to add a user.\n[*] Enter 4 to remove a user.\n[*] Enter 5 to list files.\n[*] Enter 6 to quit.\n[*] ")
+		option = input("[*] Enter 1 to encrypt files.\n[*] Enter 2 to decrypt files.\n[*] Enter 3 to add a user.\n[*] Enter 4 to remove a user.\n[*] Enter 5 to list files.\n[*] Enter 6 to list users.\n[*] Enter 7 to quit.\n[*] ")
 		if option is 1:
 			encrypt(f, f_list)
 
@@ -63,6 +69,7 @@ def main():
 				# Storing private key..
 				file = open("group/" + str(username) + "/private_key.txt", "w")
 				file.write(private_serialized)
+				file.close()
 				print("[*] Added user " + str(username) + "!")
 
 		elif option is 4:
@@ -71,10 +78,14 @@ def main():
 				print("[*] Removing user..")
 				shutil.rmtree("group/" + str(username))
 				print("[*] Generating new symmetric key and re-encrypting all files..")
+				decrypt(f, f_list)
 				key = Fernet.generate_key()
-				f = open('keys/symmetric_key.txt', 'w')
-				f.write(key)
+				file = open('keys/symmetric_key.txt', 'w')
+				file.write(key)
+				file.close()
+				f = Fernet(key)
 				print("[*] New symmetric key: " + key)
+				encrypt(f, f_list)
 			else:
 				print("[*] Username does not exist..")
 
@@ -82,9 +93,18 @@ def main():
 			for file in f_list:
 				print(file['title'])
 
-		elif option is 6: 
+		elif option is 6:
+			subs = os.listdir('group/')
+			print("[*] Users:")
+			for sub in subs:
+				print("[*] " + sub)	
+
+		elif option is 7: 
 			print("[*] Thanks for using the program!")
 			finished = True
+		
+		else:
+			print("[*] Please pick one of the options listed below..")
 		
 
 

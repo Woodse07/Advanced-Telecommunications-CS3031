@@ -48,14 +48,22 @@ def getKey(username):
 
 
 def main():
-	print("[*] Welcome to secure cloud storage application!")
+	print("   _____        _____        _____                 ")
+	print("  / ____|      / ____|      / ____|         /\     ")
+	print(" | (___       | |          | (___          /  \    ")
+	print("  \___ \      | |           \___ \        / /\ \   ")
+	print("  ____) |  _  | |____   _   ____) |  _   / ____ \  ")
+	print(" |_____/  (_)  \_____| (_) |_____/  (_) /_/    \_\ ")
+	print("[*] Welcome to secure cloud storage application!(Client side)")
 	username = raw_input("[*] Please enter your username: ")
 	if os.path.exists("group/" + str(username)):
 		print("[*] Welcome " + str(username) + "!")
 		auth = GoogleAuth()
 		auth.LocalWebserverAuth()
 		drive = GoogleDrive(auth)
+
 		key = getKey(username)	
+		print("[*] '" + key + "'")
 		f = Fernet(key)
 		f_list = drive.ListFile({'q':"'1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f' in parents and trashed=false"}).GetList()
 
@@ -63,20 +71,30 @@ def main():
 		while not finished:
 			print("[*]")
 			option = input("[*] Enter 1 to view all files.\n[*] Enter 2 to open a file.\n[*] Enter 3 to quit.\n[*] ")
+			print("[*]")
 			if option is 1:
+				print("[*] Files:")
 				for file in f_list:
-					print(file['title'])
+					print("[*] " + file['title'])
 
 			elif option is 2:
 				file_name = raw_input("[*] Enter name of file: ")
+				print("[*]")
 				for file in f_list:
 					if file["title"] == file_name:
 						encoded = file.GetContentString()
 						decoded = f.decrypt(encoded.encode())
-						print(decoded)
+						print("[*] --------------------File Contents--------------------")
+						print("")
+						print(decoded.decode())
+						print("[*] --------------------File Contents--------------------")
 	
 			elif option is 3:
-				print("todo")
+				print("[*] Thanks for using the program!")
+				finished = True
+
+			else:
+				print("[*] Please pick one of the options listed below..")
 
 
 		
