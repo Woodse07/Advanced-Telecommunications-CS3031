@@ -38,6 +38,7 @@ def main():
 	while not finished:
 		print("[*]")
 		option = input("[*] Enter 1 to encrypt files.\n[*] Enter 2 to decrypt files.\n[*] Enter 3 to add a user.\n[*] Enter 4 to remove a user.\n[*] Enter 5 to list files.\n[*] Enter 6 to list users.\n[*] Enter 7 to quit.\n[*] ")
+		print("[*]")
 		if option is 1:
 			encrypt(f, f_list)
 
@@ -87,17 +88,24 @@ def main():
 				print("[*] New symmetric key: " + key)
 				encrypt(f, f_list)
 			else:
-				print("[*] Username does not exist..")
+				print("[*] Username does not exist.. enter '6' to see list of users.")
 
 		elif option is 5:
+			print("[*] -------------------- Files --------------------")
+			print("[*]")
 			for file in f_list:
 				print(file['title'])
+			print("[*]")
+			print("[*] -------------------- Files --------------------")
 
 		elif option is 6:
 			subs = os.listdir('group/')
-			print("[*] Users:")
+			print("[*] -------------------- Users --------------------")
+			print("[*]")
 			for sub in subs:
-				print("[*] " + sub)	
+				print("[*] " + sub)
+			print("[*]")
+			print("[*] -------------------- Userss --------------------")	
 
 		elif option is 7: 
 			print("[*] Thanks for using the program!")

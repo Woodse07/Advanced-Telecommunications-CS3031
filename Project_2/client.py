@@ -73,21 +73,30 @@ def main():
 			option = input("[*] Enter 1 to view all files.\n[*] Enter 2 to open a file.\n[*] Enter 3 to quit.\n[*] ")
 			print("[*]")
 			if option is 1:
-				print("[*] Files:")
-				for file in f_list:
-					print("[*] " + file['title'])
-
-			elif option is 2:
-				file_name = raw_input("[*] Enter name of file: ")
+				print("[*] -------------------- Files --------------------")
 				print("[*]")
 				for file in f_list:
+					print("[*] " + file['title'])
+				print("[*]")
+				print("[*] -------------------- Files --------------------")
+
+			elif option is 2:
+				found = 0
+				file_name = raw_input("[*] Enter name of file: ")
+				for file in f_list:
 					if file["title"] == file_name:
+						found = 1
 						encoded = file.GetContentString()
+						print("[*] Decrypting contents of file...")
 						decoded = f.decrypt(encoded.encode())
+						print("[*] Decrypted!")
+						print("[*]")
 						print("[*] --------------------File Contents--------------------")
 						print("")
 						print(decoded.decode())
 						print("[*] --------------------File Contents--------------------")
+				if found is 0:
+					print("[*] No such file name in drive.. enter '1' to see list of files.")
 	
 			elif option is 3:
 				print("[*] Thanks for using the program!")
