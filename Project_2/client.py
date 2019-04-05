@@ -42,17 +42,29 @@ def getKey(username):
 	
 	return symmetric_key
 
+def show_files(f_list):
+	print("[*] -------------------- Files --------------------")
+	print("[*]")
+	for file in f_list:
+		print("[*] " + file['title'])
+	print("[*]")
+	print("[*] -------------------- Files --------------------")
+	print("[*]")
 
-
-
-def main():
+def logo(username):
+	os.system('cls' if os.name == 'nt' else 'clear')
 	print("   _____        _____        _____                 ")
 	print("  / ____|      / ____|      / ____|         /\     ")
 	print(" | (___       | |          | (___          /  \    ")
 	print("  \___ \      | |           \___ \        / /\ \   ")
 	print("  ____) |  _  | |____   _   ____) |  _   / ____ \  ")
 	print(" |_____/  (_)  \_____| (_) |_____/  (_) /_/    \_\ ")
-	print("[*] Welcome to secure cloud storage application!(Client side)")
+	print("[*] Welcome to secure cloud storage application "+username+"!(Client side)")
+
+
+
+def main():
+	logo("")
 	username = raw_input("[*] Please enter your username: ")
 	if os.path.exists("group/" + str(username)):
 		print("[*] Welcome " + str(username) + "!")
@@ -66,21 +78,20 @@ def main():
 		f_list = drive.ListFile({'q':"'1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f' in parents and trashed=false"}).GetList()
 
 		finished = False
+		logo(username)
 		while not finished:
 			print("[*]")
 			option = input("[*] Enter 1 to view all files.\n[*] Enter 2 to open a file.\n[*] Enter 3 to upload a file.\n[*] Enter 4 to delete a file.\n[*] Enter 5 to quit.\n[*] ")
+			logo(username)
 			print("[*]")
 			if option is 1:
-				print("[*] -------------------- Files --------------------")
-				print("[*]")
-				for file in f_list:
-					print("[*] " + file['title'])
-				print("[*]")
-				print("[*] -------------------- Files --------------------")
+				show_files(f_list)
 
 			elif option is 2:
 				found = 0
+				show_files(f_list)
 				file_name = raw_input("[*] Enter name of file: ")
+				logo(username)
 				for file in f_list:
 					if file["title"] == file_name:
 						found = 1
@@ -93,9 +104,11 @@ def main():
 						print("")
 						print(decoded.decode())
 						print("[*] --------------------File Contents--------------------")
+						print("[*]")
 				if found is 0:
 					print("[*] No such file name in drive.. enter '1' to see list of files.")
-	
+					print("[*]")	
+
 			elif option is 3:
 				file_name = raw_input("[*] Enter name of file to upload: ")
 				file = drive.CreateFile({"parents": [{"kind": "drive#fileLink", "id": "1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f"}],'title':file_name})
@@ -107,24 +120,31 @@ def main():
 				file.Upload()
 				print("[*] Uploaded!")
 				f_list = drive.ListFile({'q':"'1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f' in parents and trashed=false"}).GetList()
+				print("[*]")
 			
 			elif option is 4:
 				found = 0
+				show_files(f_list)
 				file_name = raw_input("[*] Enter name of file: ")
+				logo(username)
 				for file in f_list:
 					if file["title"] == file_name:	
 						found = 1
 						file.Delete()
 						print("[*] Deleted " + file_name + "!")
+						print("[*]")
 				if found is 0:
 					print("[*] No such file name in drive.. enter '1' to see list of files.")
+					print("[*]")
 
 			elif option is 5:
 				print("[*] Thanks for using the program!")
+				print("[*]")
 				finished = True
 
 			else:
 				print("[*] Please pick one of the options listed below..")
+				print("[*]")
 
 
 		
@@ -133,20 +153,6 @@ def main():
 
 	else:
 		print("[*] You are not part of the admin's group.. please contact admin for an invite.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
 	main()
