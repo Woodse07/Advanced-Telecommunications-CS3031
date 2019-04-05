@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives import serialization
 import os
 import shutil
 
+# Shows all the users that are part of the admin's group
 def show_users():
 	subs = os.listdir('group/')
 	print("[*] -------------------- Users --------------------")
@@ -19,6 +20,7 @@ def show_users():
 	print("[*] -------------------- Users --------------------")	
 	print("[*]")
 
+# Shows all the files in the folder of the drive
 def show_files(f_list):
 	print("[*] -------------------- Files --------------------")
 	print("[*]")
@@ -28,6 +30,7 @@ def show_files(f_list):
 	print("[*] -------------------- Files --------------------")
 	print("[*]")
 
+# Clears terminal and prints logo
 def logo():
 	os.system('cls' if os.name == 'nt' else 'clear')
 	print("   _____        _____        _____                 ")
@@ -41,10 +44,13 @@ def logo():
 
 def main():
 	logo()
+
+	# Google Authentication
 	auth = GoogleAuth()
 	auth.LocalWebserverAuth()
 	drive = GoogleDrive(auth) 
 
+	# Grab the symmetric key.. if it doesn't exist, generate a new one
 	try:
 		f = open('keys/symmetric_key.txt', 'r')
 		key = f.read()
@@ -54,23 +60,30 @@ def main():
 		f = open('keys/symmetric_key.txt', 'w')
 		f.write(key)
 		print("[*] Your symmetric key: '" + key + "'")
-
 	f = Fernet(key)
+	
+	# Grabbing list of files in folder of drive.. change the id here to change folder.
 	f_list = drive.ListFile({'q':"'1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f' in parents and trashed=false"}).GetList()
 
+	# Guts of the program..
 	finished = False
 	logo()
 	print("[*]")
+	# Present admin with list of options..
 	while not finished:
 		option = input("[*] Enter 1 to encrypt files.\n[*] Enter 2 to decrypt files.\n[*] Enter 3 to add a user.\n[*] Enter 4 to remove a user.\n[*] Enter 5 to list files.\n[*] Enter 6 to list users.\n[*] Enter 7 to quit.\n[*] ")
 		logo()
 		print("[*]")
+		# Encrypts all files in the folder of the drive..
 		if option is 1:
 			encrypt(f, f_list)
 
+		# Decrypts all files in the folder of the drive..
 		elif option is 2:
 			decrypt(f,f_list)
 
+		# Adds a user to the group.. basically just creates a new folder whose name is the 
+		# name of the user, and generates an rsa key and stores it in that folder. 
 		elif option is 3:
 			username = raw_input("[*] Enter username: ")
 			if os.path.exists("group/" + str(username)):
@@ -101,6 +114,9 @@ def main():
 				print("[*] Added user " + str(username) + "!")
 				print("[*]")
 
+		# Removes a user.. basically deletes the folder whose name is the same as the users, 
+		# decrypts all the files in the folder of the drive, generates a new symmetrics key,
+		# and re-encrypts all the files in folder of the drive.
 		elif option is 4:
 			show_users()
 			username = raw_input("[*] Enter username: ")
@@ -124,12 +140,15 @@ def main():
 				print("[*] Username does not exist.. enter '6' to see list of users.")
 				print("[*]")
 
+		# Shows all files in the folder of the drive..
 		elif option is 5:
 			show_files(f_list)
 
+		# Shows all users in the admin's group..
 		elif option is 6:
 			show_users()
 
+		# Exit()
 		elif option is 7: 
 			print("[*] Thanks for using the program!")
 			finished = True

@@ -16,16 +16,19 @@ from flask import Flask
 from flask import request
 app = Flask(__name__)
 
+# Create route for get_key function
 @app.route('/get_key', methods=['GET'])
 def index():
+	# Grab username and public_key for that user.
 	username = request.args.get('username')
 	pub_key = request.args.get('pub_key').encode('ascii')
-
 	public_key = serialization.load_pem_public_key(pub_key,backend=default_backend())
 
+	# Grab the unencrypted symmetric key..
 	key = open("keys/symmetric_key.txt", "r")
 	key = key.read()
 
+	# Encrypt the symmetric key..
 	encrypted = public_key.encrypt(
     key,
     padding.OAEP(
@@ -35,6 +38,7 @@ def index():
     	)
 	)	
 
+	# Return the symmetric key specifically encrypted for that user...
 	encrypted = base64.b64encode(encrypted)
 
 	print("encrypted symmetric key.. sending to client..")

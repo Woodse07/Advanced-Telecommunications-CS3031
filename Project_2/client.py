@@ -12,16 +12,21 @@ import base64
 import requests
 import os
 
-# getkey() function is temprorary.. will replace with some web framework?
+# Takes in a username and returns the encrypted version of the symmetric key specifically 
+# for that user.
 def getKey(username):
+	# Grabbing private key..
 	with open("group/" + str(username) + "/private_key.txt", "rb") as key_file:
 		private_key = key_file.read()
 	private_key = load_pem_private_key(private_key, None, default_backend())
+	
+	# Generating public key..
 	public_key = private_key.public_key()
 	public_key = public_key.public_bytes(
             	 	encoding=serialization.Encoding.PEM,
             	  	format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
+	# Sending request to flask server..
 	print("[*] Requesting symmetric key from server..")
 	URL = "http://127.0.0.1:5000/get_key"
 	PARAMS = {'username' : username, 'pub_key': public_key}
@@ -29,6 +34,7 @@ def getKey(username):
 	encrypted = r.text
 	print("[*] Received encrypted symmetric key from server..")
 
+	# Decrypting response from flask server..
 	encrypted = base64.b64decode(encrypted)
 	symmetric_key = private_key.decrypt(
     encrypted,
@@ -42,6 +48,7 @@ def getKey(username):
 	
 	return symmetric_key
 
+# Shows all files in the folder of the drive..
 def show_files(f_list):
 	print("[*] -------------------- Files --------------------")
 	print("[*]")
@@ -51,6 +58,7 @@ def show_files(f_list):
 	print("[*] -------------------- Files --------------------")
 	print("[*]")
 
+# Clears terminal and prints logo
 def logo(username):
 	os.system('cls' if os.name == 'nt' else 'clear')
 	print("   _____        _____        _____                 ")
@@ -65,6 +73,7 @@ def logo(username):
 
 def main():
 	logo("")
+	# Prompts client for username and checks if they're a valid user..
 	username = raw_input("[*] Please enter your username: ")
 	if os.path.exists("group/" + str(username)):
 		print("[*] Welcome " + str(username) + "!")
@@ -72,6 +81,7 @@ def main():
 		auth.LocalWebserverAuth()
 		drive = GoogleDrive(auth)
 
+		# Get symmetric key..
 		key = getKey(username)	
 		print("[*] '" + key + "'")
 		f = Fernet(key)
@@ -81,12 +91,17 @@ def main():
 		logo(username)
 		while not finished:
 			print("[*]")
+			# Present user with options...
 			option = input("[*] Enter 1 to view all files.\n[*] Enter 2 to open a file.\n[*] Enter 3 to upload a file.\n[*] Enter 4 to delete a file.\n[*] Enter 5 to quit.\n[*] ")
 			logo(username)
 			print("[*]")
+			
+			# Shows all files in the folder of the drive..
 			if option is 1:
 				show_files(f_list)
 
+			# Opens the contents of a file.. basically grabs contents of the file in the
+			# drive and drcrypts it using the symmetric key.
 			elif option is 2:
 				found = 0
 				show_files(f_list)
@@ -109,6 +124,8 @@ def main():
 					print("[*] No such file name in drive.. enter '1' to see list of files.")
 					print("[*]")	
 
+			# Uploads a file.. just takes in the name of a file form secret_files/ and 
+			# encrypts it before uploading..
 			elif option is 3:
 				file_name = raw_input("[*] Enter name of file to upload: ")
 				file = drive.CreateFile({"parents": [{"kind": "drive#fileLink", "id": "1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f"}],'title':file_name})
@@ -122,6 +139,7 @@ def main():
 				f_list = drive.ListFile({'q':"'1l53l9SNSC2qwj6wfDCMFQvXMOhX1BI0f' in parents and trashed=false"}).GetList()
 				print("[*]")
 			
+			# Removes a file.. self explanatory. 
 			elif option is 4:
 				found = 0
 				show_files(f_list)
@@ -137,6 +155,7 @@ def main():
 					print("[*] No such file name in drive.. enter '1' to see list of files.")
 					print("[*]")
 
+			# Exit.
 			elif option is 5:
 				print("[*] Thanks for using the program!")
 				print("[*]")
@@ -150,7 +169,7 @@ def main():
 		
 		
 
-
+	# If user is not a valid user, print this.
 	else:
 		print("[*] You are not part of the admin's group.. please contact admin for an invite.")
 
