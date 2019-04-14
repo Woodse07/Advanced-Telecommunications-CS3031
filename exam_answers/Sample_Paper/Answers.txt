@@ -9,3 +9,135 @@ Distinguish between UDP and TCP in terms of:
 For IP Telephony and IP Videoconferencing, which protocol would be preferable? Why?
 
 Answer:
+
+TCP v UDP:
+- Reliable data transfer:
+	- TCP is very reliable,
+	  has no loss, 
+	  uses ACK's and selective repeat to error correct.
+	
+	- UDP is unreliable, 
+	  has no acks,
+	  detects errors using checksum but has no error correction/recovery.
+
+- Header size:
+	- TCP header has at least 20 bytes,
+	  requires seq number and ack number,
+	  has control flags,
+	  checksum,
+	  data offset,
+	  and window size.
+
+	- UDP header has 8 bytes,
+	  only source and destination port numbers,
+	  checksum,
+	  and data length.
+
+- Connection overheads:
+	- TCP has a larger overhead and therefore a slower connection.
+	  Error checking and recovery introduce larger overhead but improve reliability.
+	
+	- UDP has a smaller overhead and therefore a faster connection.
+	  Less error detection means smaller overhead but reliability decreases.
+
+TCP or UDP for IP Telephone/Videoconferencing.
+- UDP would be preferred for IP telephone and videoconverencing as audio and video can be lossy
+  and still understood, but its main priority is speed of transfer which UDP does best as it sends
+  information when requested and then forgets about it.
+
+
+(b)
+Draw FSM of corresponding receiver to a FSM for a reliable sender that can handle garbled
+ACKs and NAKs
+*** IN COPY ***
+
+
+(c)
+With the help of a FSM describe the main building blocks of the TCP Congestion Control Algorithm.
+(Required to detail the state transitions in the FSM).
+
+- Congestion Control occurs when too many sources are sending too much data too fast 
+  for the network to handle.
+
+- This can result in lost packets (buffer overflow in routers) and long delays (queuing in router).
+
+Building blocks:
+- Slow Start:
+	- When connection starts, increase rate exponentially until first loss.
+	  Initially CWND = 1mss, double every RTT(round trip time).
+
+- Congestion Avoidance.
+
+- Faster Recovery.
+
+*** FSM IN COPY ***
+
+
+(d)
+What is the role of a 'web proxy' in a large insitutional network? 
+What are the main advantages of installing a proxy server?
+
+- The role of a web proxy is to sit between the institutional network and the origin server
+  of the HTTP request.
+
+- A client inside the institution's browser sends all of its HTTP requests to the web proxy server.
+	- If the proxy contains the object the browser is looking for in its cache, it is returned.
+
+	- If the proxy doesn't contain the object the browser is looking for, the proxy requests
+	  the object from the origin server and then the proxy returns the requests object to 
+	  the client's browser.
+
+- Some advantages of using a web proxy:
+	- Anonymous browsing:
+		- As your internal IP address can't be seen by the external network,
+		  only your proxy IP can.
+
+	- Safer browsing:
+		- Hackers can't access your internal IP address.
+
+	- Access filtered websites:
+		- Changing your web proxy can allow you to access websites otherwise hidden 
+		  by your institution proxy.
+
+	- Performance / speed:
+		- Proxies act as a cache, storing documents and site requests, speeding up future
+		  requests using its cache.
+
+	- Filter requests:
+		- Used in institutions to stop malicious downloads, etc.
+
+	- Load balancing: 
+		- Can be used in reverse as a load-balancer for sharing workload among several HTTP
+		  servers.
+
+
+(e)
+What is a 'websocket' and what are its advantages over technologies such as AJAX and Comet?
+Why are websockets more efficient than traditional HTTP exchanges?
+
+- A websocket defines an API establishing a two-way socket connection between a web browser and
+  server, where both parties can send data at any time. 
+
+- Advantages over AJAX/Comet:
+	- Websockets are event driven, wherease AJAX/Comet are request/response driven.
+
+	- Client and server can emit events and data to each other whenever they need to whereas
+	  with AJAX/Comet, each request is given a generated response by a server just like 
+	  refreshing a web page.
+
+	- Websockets only establish a connection once, AJAX/Comet establish a new connection with 
+	  each request.
+
+	- Websockets are better for real time applications like messaging apps or google docs, as
+	  a new connection doesn't need to be made when changes(events) occcur, whereas with 
+	  AJAX/Comet it would request a new connection.
+
+- Websockets vs HTTP:
+	- Websockets are bi-directional, http is request/response.
+	
+	- Websockets only require moderate overhead to establish the connection, but each event
+	  only requires minimal overhead. By contrast, HTTP requires moderate overhead for every 
+	  request/response.
+
+
+	
