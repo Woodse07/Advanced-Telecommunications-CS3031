@@ -1,0 +1,11 @@
+QUESTION 1:
+
+(a)
+Distinguish between UDP and TCP in terms of:
+	1. Reliable data transfer.
+	2. Header size.
+	3. Connection overheads.
+
+For IP Telephony and IP Videoconferencing, which protocol would be preferable? Why?
+
+Answer:
