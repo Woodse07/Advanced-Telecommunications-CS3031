@@ -1,0 +1,168 @@
+QUESTION 1:
+(a)
+What is the role of a 'web proxy' in a large institutional network?
+What are the main advantages of a proxy server?
+
+Answer:
+- The role of a web proxy is to sit between the institutional network and the origin server of the 
+  HTTP request.
+
+- A client inside the institutional network sens all of its HTTP requests to the web proxy.
+	- If the proxy contains the object being requested in its cache, it returns it.
+	
+	- If the proxy doesn't contain the requested object in its cache, it forwards the 
+	  request to the origin server and then returns the response to the client.
+
+- Some advantages of a web proxy:
+	- Anonymous browsing:
+		- As your internal IP address can't be seen by the external network, only
+		  your proxy ip.
+
+	- Safer browsing:
+		- Hackers can't access your internal IP address.
+
+	- Access filtered websites:
+		- Changing your web proxy can allow you to access websites otherwise hidden 
+		  by your institution proxy.
+
+	- Performance/Speed:
+		 - Using a proxy acts like a cache, storing objects that are frequently requested,
+		   speeding up future requests.
+
+	- Filter requests:
+		- Used in institutions to stop malicious downloads, etc.
+
+	- Load balancing:
+		- Can be used in reverse to share the workload among several HTTP servers.
+
+
+(b)
+Given the network and associated assumptions in the figure below, calculate:
+	- The LAN Utilization
+	- Access Link Utilization
+	- Total Delay
+
+Now assume that we install a web proxy server into the institutional network with a hit
+rate of 40%, calculate:
+	- Access Link Utilization
+	- Total Delay
+
+Assumptions:
+	- Avg object size: 					100k bits
+	- Avg request rate from browsers to origin servers: 	15 requests/sec
+	- Avg data rate to browsers: 				1.5Mbps
+	- RTT from institutional router to any origin server:	2 sec (Internet delay)
+	- Access link rate: 					1.54 Mbps
+
+Answer:
+
+To do...
+
+
+(c)
+Describe the basic server hierarchy within the domain name system (DNS).
+Describe how DNSSEC validation takes place within a zone by detailing the various Resource Records
+(RRs), RRsets and Signature Keys that are required to secure a domain. 
+*(DNSSEC = Domain Name System Security Extensions)
+
+Answer:
+- DNS is a distributed database implemented in a hierarchy of many name servers.
+	- Root name servers are contacted by local name servers that cannot resolve a name.
+ 	  The root name server returns a list of IP address for responsible TLD servers.
+	  Root domain symbolized by a '.'
+
+	- Top level domain(TLD) servers are responsible for com, org, net, edu, etc. and all top
+	  level country domains.
+	
+	- Authorative DNS servers organise their own DNS servers, providing authoritative hostname
+	  to IP mappings for the organisations' names hosts. They can be maintained by an 
+	  organisation or service provider.
+	  'army.mil'
+
+	- Can be split further down into zones (e.g.) 'washington.army.mil'
+
+- DNSSEC Validation:		
+	- Request desired RRset, which returns corresponding RRSIG record.
+	- Request DNSKEY records containing public ZSK and public KSK,
+	  which returns the RRSIG for the DNSKEY RRset.
+	- Verify the RRSIG of the requested RRset with the public ZSK.
+	- Verify the RRSIG of the DNSKEY RRset with the public KSK.
+
+
+(d)
+What is a 'websocket' and what are its advantages over technologies such as AJAX and Comet?
+Why are websockets more efficient than traditional HTTP exchanges?
+
+- A websocket defines an API establishing a two-way socket connection between a web browser and
+  server, where both parties can send data at any time.
+
+- Advantages over AJAX/Comet:
+	- Websockets are event driven, whereas AJAX/Comet are request/response driven.
+
+	- Client and server can emit events and data to eachother whenever they need to, wherease
+	  with AJAX/Comet each request is given a generated response by a server just like 
+	  refreshing a web page.
+
+	- Websockets only establish a connection once, AJAX/Comet establish a new connection
+	  with each request.
+
+	- Websockets are better for real time applications like messaging apps or google docs, as
+	  a new connection doesn't need to be made every time a change occurs, whereas with 
+	  AJAX/Comet it would request a new connection.
+
+- Websockets vs HTTP:
+	- Websockets are bi-directional, http is request/response.
+
+	- Websockets only require a moderate amount of overhead to establish a connection, and 
+	  minimal overhead for each event. By contrase HTTP requires moderate overhead for every
+	  request/response.
+
+
+(e)
+Describe in detail the main components of a X.509 certificate.
+Explain the 'handshake' procedure used in the secure sockets layer (SSL) protocol to establish
+a secure tunnel between a web browser and server. 
+
+Answer:
+-The TTP(Trusted Third Party) constructs a message referred to as a certificate:
+
+	| Subject | Public Key | Validity Period | Issuer | Other Fields | Signature of TTP |
+
+	- Contains a digital signature on the other fields with the private key of the TTP.
+	  This system assumes that every user is equipped with the public key of the TTP. This
+	  allows everyone to verify the digital signature on the certificate, guaranteeing that the
+	  public key is assosciated with the named user.
+
+-SSL Handshake:
+	-The client sends:
+		- List of algorithms it supports.
+		- Client nonce.
+
+	- The server sends back:
+		- Choice of algorithms
+		- Certificate
+		- Server Nonce
+
+	- The client:
+		- Verifies the certificate
+		- Extracts the server's public key
+		- Generates pre_master_secret
+		- Encrypts pre_master_secret with server's public key
+		- Sends the encrypted master secret to server
+
+	- The client and server independently compute the encryption keys and MAC keys from 
+	  pre_master_secret and the nonces.
+
+	- The client sends a MAC of all the handshake messages.
+
+	- The server sends a MAC of all the handshake messages.
+
+	- This is all done to make sure that no one has changed the sequence of events.
+	  The final two steps prevent a MITM attack from deleting stronger algorithms from the list.
+
+
+	
+
+
+
+
