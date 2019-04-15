@@ -322,6 +322,12 @@ What can be done to mitigate this problem?
 
   
 
+QUESTION 3:
+(a)
+Describe the ECB(Electronic Code Book) mode used in the DES cipher.
+Explain how the CBC(Cipher Block Chaining) mode overcomes the block subsitution attack of ECB mode.
+Explain why the OFB(Output Feedback Mode) is described as being a 'synchronous stream cipher'.
+
 
 
 
