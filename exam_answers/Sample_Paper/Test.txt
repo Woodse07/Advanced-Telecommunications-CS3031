@@ -1,0 +1,235 @@
+QUESTION 1:
+(a)
+(i)
+Distinguish between UDP and TCP in terms of:
+	- Reliable data transfer
+	- Header size
+	- connection overheads
+
+(ii)
+For IP Telephony and IP Videoconferencing, which one of TCP and UDP would be preferable?
+Justify your answer.
+
+Answer:
+(i)
+TCP:
+	- Reliable Data Transfer:
+	  Is very reliable, has error checking and can retransmit lost packets.
+	- Header Size:
+	  Size is 20-60 bytes..
+	  Includes: Source port, destination port, seq num, ack num, data offset, reserved, 
+		    control flags, window size, checksum, urgent data pointer, optional data.
+	- Connection overheads:
+	  Yes, does have a connection overhead.
+
+UDP:
+	- Reliable Data Transfer:
+	  Is not very reliable, can check for errors but can't retransmit packets.
+	- Header Size:
+	  Only 8 bytes, which inclue src port, dest port, length and checksum.
+	- Connection Overheads:
+	  Has no connection overhead since UDP is connectionless.
+
+(ii)
+UDP would be preferable, since these can be lossy and still interpreted. The most important thing
+with real time applications is speed.
+
+
+(b)
+Diagram below shows FSM for a reliable sender that can handle garbles ACKs and NAKs.
+Draw the FSM for the corresponding receiver.
+
+Answer:
+**IN COPY**
+
+
+(c)
+With the help of a FSM describe the main building blocks of the TCP Congestion Control 
+Algorithm. 
+You are required to detail the state transitions in the FSM.
+
+Answer:
+TCP Congestion Control algorithm is a additive gain, multiplicative loss algorithm. 
+The initial segment size is defined by MSS(Max Segment Size), and every round trip time where 
+a packet is not lost, the segments sent is increase by 1 MSS.
+However, if a packet is lost, the amount of segments sent is divided by 2.
+
+**DIAGRAM IN COPY**
+
+
+(d)
+What is the role of a 'web proxy' in a large institutional network?
+What are the main advantages of installing a proxy server?
+
+Answer:
+The role of a web proxy is to sit in between the institutional network and the origin servers.
+The web proxy should receive all of the requests from the institutional network, check to see
+if they have the result for this particular request cached, if they do return it, if they don't,
+send the request to the origin server, and send the result of this back to the institutional 
+network.
+
+Advantages:
+	- Privacy: Using a proxy will hide your IP.
+	- Security: Hackers will not be able to see your IP.
+	- Speed: Cached results improves performance. 
+
+
+(e)
+What is a 'websocket' and what are its advantages over technologies such as AJAX/Comet?
+Why are websockets more efficient than traditional HTTP exchanges.
+
+A websocket is a two-way connection between a client a server.
+It is event driven and both parties can send data at any time. 
+
+Advantages over AJAX/Comet:
+	- Websocket is event driven, AJAX/Comet are request/response driven.
+	- Client and server can emit events and data to each other whenever they need to,
+	  whereas AJAX/Comet, each request is given generated response by a server.
+	- Establishes a connection once, AJAX/Comet establish a connection for every request.
+	- Websockets are better for realtime applications, as new connection doesn't need to 
+	  be made for every request.
+
+Websockets vs HTTP:
+	- Websockets are bi-directional, http request/response.
+	- Websockets require moderation overhead to establish a connection, minimal from there on.
+	- HTTP require moderate overhead for every request/respsonse.
+
+
+
+QUESTION 2:
+(a)
+Describe the ECB mode in the DES cipher.
+Explain how the CBC mode overcomes the block substitution attack of ECB mode.
+Explain why the OFB mode is described as being a 'synchronous stream cipher'.
+
+Answer:
+ECB mode:
+	- Message is split into blocks.
+	- Each block is encrypted with the key.
+	- Each block is indepedendent.
+	- ECB mode is highly predictable, same message encrypted twice will return an identical
+	  encrypted message.
+	- Susceptible to block substitution attack.
+	- Since each block is independent, can be parallelised (High speed implementations)
+	- Bit errors from noisy transmission only affect corresponding blocks. 
+
+CBC mode overcomes this by making each block dependent on the last. 
+Every block is XOR'd by the last block and then encrypted with the key. 
+The first block is XOR'd with an initilisation vector. (Nonce)
+
+OFB mode is described as a 'synchronous stream cipher' because they key stream is generated
+in a blockwise fashion rather than bitwise and it does not depend on the plaintext or 
+ciphertext.
+The cipher output 'b' key stream bits, where 'b' is the width of the block cipher used.
+We can encrypt 'b' plaintext bits using XOR operation. 
+
+
+(b)
+Coputing module exponentiation efficiently is inevitible for the practicability of RSA.
+Compute the following exponentiation X^e mod m by applying the square-and-multiply algorithm:
+
+x=2, e=79, m=101
+
+After every iteration, show the exponent of the intermediate result.
+
+Answer:
+
+79 in binary = 1001111
+
+-		1001111	     	-		Begin..
+(2)		001111		-		1 encountered, start with 2..
+(2)^2		01111	2^2 mod 101=4		0 encountered, square..
+(4)^2		1111	4^2 mod 101=16		0 encountered, square..
+((16)^2)*2	111	16^2*2 mod 101=7 	1 encountered, square and multiply..
+((7)^2)*x	11	7^2*2 mod 101=98	1 encountered, square and multiply..
+((98)^2)*x	1	98^2*2 mod 101=18	1 encountered, square and multiply..
+((18)^2)*x	-	18^2*2 mode 101=42	-
+
+2^79 mod 101 = 42.
+
+
+(c)
+What are the distinguishing characteristics of a Group?
+What is the order ord(a) of a group (G, o)?
+Determine the order of a=3 in Z_11*.
+Let G be a finite cyclic group.
+Find the number of primitive elements in Z_5*.
+
+Answer:
+A group(G, o):
+	- Takes two elements of G, performs operation o on them, and results in an element of G.
+	- a o b = b o a
+	- a o (b o c) = (a o b) o c
+	- Has an identity element 1 such that a o 1 = a
+	- Every element a of g has an inverse a^-1 such that: a o a^-1 = 1
+
+The order ord(a) of a group(G,o) is the smallest value such that:
+a^k = a o a o .. o a = 1
+
+Keep computing powers of a until we obtain identity element 1..
+a^1 = 3 = 3 (mod 11)
+a^2 = 9 = 9 (mod 11)
+a^3 = 27 = 5 (mod 11)
+a^4 = 81 = 4 (mod 11)
+a^5 = 243 = 1 (mod 11)
+Order = 5
+
+Find order of Z_5*
+Check if a=2 is a primitive element:
+a^1 = 2 = 2 (mod 5)
+a^2 = 4 = 4 (mod 5)
+a^3 = 8 = 3 (mod 5)
+a^4 = 16 = 1 (mod 5)
+Order = 4
+Number of primitive elements = phi(|G|)
+If |G| is prime, all elements but 1 are pimitive. 
+As |G| = 4
+phi(4) = (2^2 - 2^1) = 2
+There are 2 primitive elements of Z_5*.
+
+(d)
+Not in exam..
+
+(e)
+Given the elliptic curve E over Z_17 and the base point P=(5,1):
+
+E: y^2 = x^3 + 4x + 20 mod 17
+
+Calculate the following point multiplication 2P using the formulae provided below:
+
+x3 = s^2 - x1 - x2 mod p
+y3 = s(x1-x3) - y1 mod p
+
+where
+	(y2-y1)/(x2-x1) mod p ; if p != Q(point addition)
+s = {
+	(3x1^2+a)/(2y1) mod p ; if p = Q (point doubling)
+
+You are required to show the extended euclidean algorithm (EEA) calculation for computing
+the multiplicative inverse.
+
+Answer:
+Because we're only given 1 point, we can't use point addition, we must use point doubling. 
+P=(5,1) x1=5, y1=1
+
+E: y^2 = x^3 + 4x + 20 mod 17
+Line takes form: y^2 = x^3 + ax + n mod m
+
+a=4
+
+Using equation above for point doubling...
+s = 39.5 mod 17 
+s = 5.5
+
+x3 = s^2 - x1 - x1
+x3 = s^2 - 2(x1)
+x3 = 5.5^2 - 2(5)
+x3 = 20.25 mod 17
+x3 = 3.25
+
+y3 = s(x1-x3) - y1 mod p
+y3 = 5.5(5-3.25) - 1
+y3 = 8.625 mod 17
+y3 = 8.625
+
+R = (3.25, 8.625)
