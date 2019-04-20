@@ -1,0 +1,140 @@
+QUESTION 1:
+All parts done elsewhere..
+
+QUESTION 2:
+All parts done elsewhere..
+
+QUESTION 3:
+(a)
+Describe some of the components that comprise modern day block ciphers?
+In particular describe with the aid of the Vigenere Cipher.
+
+Answer:
+Components include:
+	- Deterministic Algorithm.
+	- Operates on a fixed-length group of bits (the block).
+	- Uses a key.
+
+Vigenere Cipher:
+	- Pick a key.
+	- Build a poly-alphabetic cipher
+		- Write the key with a letter per row.
+		- Begin writing the alphabet at that letter and wrap around.
+
+	Example key: BOX
+	A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+	--------------------------------------------------- 
+	B C D E F G H I J K L M N O P Q R S T U V W X Y Z A
+	O P Q R S T U V W X Y Z A B C D E F G H I J K L M N
+	X Y Z A B C D E F G H I J K L M N O P Q R S T U V W
+
+	- Repeat your key for the length of the plaintext.
+	- For a given letter in the repeated key, go to the corresponding row in the square. 
+	- For a given letter in the plaintext, go to the column where that letter should be.
+	- This is your cipher letter.
+	
+	- Example: 	SEAMUS
+	- Key:     	BOXBOX
+	- Ciphertext: 	TSXNIP
+
+
+(b)
+With the aid of an example, show why the ECB mode is susceptible to substitution attacks.
+Describe the CBC mode and how it can provice probabilistic encryption to overcome the 
+deterministic features of ECB mode.
+
+Answer: 
+ECB mode encodes each 64-bit block independently.
+This causes repetitive part-blocks of ciphertext to emerge, or the information can be replicated.
+For example, a repeated request for withdrawal of $1bn could be made, or blocks can be moved 
+around, such as swapping bonuses in an encrypted spreadsheet.
+
+For CBC, the plaintext is XORd with an initiliasation vector before being ecnrypted. 
+The result of this is passed onto the next block to be XORd against that before being encrypted.
+This makes each block dependent on the last.
+
+This means that parts of the request can't be shifted around, since the cipher at a given point
+is dependent on the previous cipher. 
+This initialisation vector also prevents repeated requests, as this value changes each time.
+
+
+(c)
+Define a cyclic group G.
+What is the primitive element or generator of the group G?
+Check if a=2 is a primitive element of Z_11*.
+Is the group Z_11* a cyclic group?
+
+Answer:
+A group G is cyclic if it contains an element 'a' which can generate the entire group.
+(i.e.) ord(a) = |G|
+
+A primitive element of group G is an element that can generate the entire group. 
+
+a^1 = 2 	= 2 (mod 11)
+a^2 = 4 	= 4 (mod 11)
+a^3 = 8 	= 8 (mod 11)
+a^4 = 16 	= 5 (mod 11)
+a^5 = 32 	= 10 (mod 11)
+a^6 = 64 	= 9 (mod 11)
+a^7 = 128 	= 7 (mod 11)
+a^8 = 256 	= 3 (mod 11)
+a^9 = 512 	= 6 (mod 11)
+a^10 = 1024 	= 1 (mod 11)
+a=2 is a primitive element of Z_11*.
+ord(a) = 10 = |Z_11*|
+
+Z_11* is a cyclic group since there exists a primitive element in the group (a=2)
+
+
+(d)
+Compute the two public keys and the common key for the Diffie-Hellman key exchange(DHKE)
+with the parameters:
+	- p=467
+	- alpha=2
+	- a=228
+	- b=57
+Show with the aid of an example how the DHKE scheme is vulnerable to the MITM attack.
+
+Answer:
+	1. A => alpha^a  => 4.313591647x10^68 mod 467 = 394
+	   This is Alice's public key, which is sent to Bob.
+	2. B => alpha^b => 1.441151881x10^17 mod 467 = 313
+	   This is Bob's public key, sent to Alice.
+	3. B^a mod 467 = 206..(Alice)
+	4. A^b mod 467 = 206..(Bob)
+
+(alpha^a)^b mod p = (alpha^b)^a mod p
+
+MITM Attack:
+	- Trudy intercept Alice's public key and sends hers to Bob.
+	- Trudy generates the shared key between herself and Bob.
+	- Trudy does the same for Bob's public key to Alice.
+	- She can now access and modify messages between Bob and Alice.
+
+
+(e)
+Describe in detail the Handshake in the secure sockets layer(SSL) protocol.
+When we talk about authentication in SSL, do we mean message authentication, or entity
+authentication?
+What is the purpose of the random nonces in the SSL handshake?
+
+Answer:
+Handshake:
+	- Client sends list of algorithms it supports and a client nonce.
+	- Server chooses algorithms and sends back choice, certificate and server nonce.
+	- Client verifies certificate, extracts server's public key, generates a pre_master_secret,
+	  encrypts it with the server's public key and sends that to the server.
+	- Client and server compute encryption and MAC keys from pre_master_secret and nonces.
+	- Client sends a MAC of all handshake messages.
+	- Server sends a MAC of all handshake messages.
+
+Message Authentication: Bob wants to ensure messages originally came from Alice.
+
+Message Integrity: Bob wants to ensure message from Alice hasn't been changed.
+
+MAC = Message Authentication?
+
+The nonce is used to prevent against replay attacks.
+Trudy can't attempt to use the same messages that were used in the previous connection as a
+new key will be generated with unique nonces.
+
