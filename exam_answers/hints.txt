@@ -1,0 +1,12 @@
+- 2 questions, answer *all*
+
+- Question 1:
+	- Probably on transport layer + application layer..(40%)
+
+- Question 2:
+	- Probably on security..(60%)
+
+- Electronic payment systems are *not* on the exam
+
+- Jakub thinks RDT will come up?
+

@@ -1,0 +1,233 @@
+QUESTION1:
+(a)
+Briefly explain the role of HTTP in web communications:
+
+Answer:
+HTTP is an application protocol for transferring hypertext (e.g. HTML).
+It is a request-response protocol in the client-server computing model.
+It was designed to permit intermediate network elements to improve or enable communications
+between Clients and servers. 
+
+
+(b)
+Why is HTTP 1.0 called a stateless protocol?
+
+Answer:
+A stateless protocol means that the server maintains no information about the clients past
+requests, which holds true for HTTP 1.0.
+
+
+
+QUESTION 2:
+Describe how an e-commerce site can keep a purchase record of each of its customers using cookies.
+
+Answer:
+Cookies maintain the state at the sender/receiver over multiple HTTP transactions.
+They have six parameters:
+	- Name of cookie
+	- Value of cookie
+	- Expiration of cookie
+	- Path the cookie is valid for
+	- Domain the cookie is valid for
+	- The need for a secure connection.
+This alllows the site to keep a record of a user by identifying them and storing their information.
+In the case of an e-commerce website it can be used to keep a record of a user's purchase history.
+
+
+
+QUESTION 3:
+Access link rate: 15Mbps
+LAN rate: 100Mbps
+Average Object Size: 960,000 bits = 0.96Mb
+Average request rate: 15 requests/second
+RTT: 2 seconds
+
+(a)
+Find the average response time.
+
+Answer:
+△ = average_object_size / Access_link_rate
+△ = 0.96 / 15
+△ = 0.064 s/r
+
+B = 15 r/s
+
+Average access delay = △ (1-△ B)
+
+(0.064)/△ (1- △ B)
+(0.064)/(1 - (0.064)(15)) = 1.6 seconds
+
+Average repsonse time = Average_access_Delay + average_internet_delay
+		      = 1.6 + 2 = 3.6 seconds
+
+
+
+(b)
+Find the total repsonse time if a cache is installed in the institutional LAN with a miss rate
+of 0.4 using above data.
+
+Answer:
+Miss rate = 0.4
+
+Average access delay = △ /(1-MissRate△ B)
+		     = 0.064 / (1-0.4(0.064)(15))	
+		     = 0.104 seconds
+
+Average response time = 0.104 + 2 = 2.104 seconds
+
+Total respsonse delay = (0.6*0) + (0.4*2.104) = 0.842 seconds
+
+
+
+QUESTION 4:
+(a)
+Consider what happens when a browser, running in some user's host, requests te URL:
+somesite.com/index.html.
+In order for the user's host to be able to send a HTTP request message to the web server
+www.somesite.com. 
+Explain the steps through which the IP address for such a hostname is obtained by the client.
+
+Answer:
+	1. Firstly, the client queries the ISP of the IP of www.somesite.com.
+	2. The ISP queries the root server to find IP address of .com DNS server.
+	3. ISP queries .com server to find IP address of somesite.com DNS server.
+	4. ISP queries somesite.com to find IP address of www.somesite.com DNS server.
+	5. ISP returns IP address of www.somesite.com to the client.
+	6. Client is now able to access the host. 
+
+
+(b)
+What is DNS?
+
+Answer:
+DNS stands for Domain Name System.
+It is a hierarchial decentralised naming system for resources connected to the internet.
+It assigns a hierarchy of names to IP addresses.
+(e.g.) Google.ie = 209.85.203.94
+
+
+(c)
+What protocol does DNS use?
+
+Answer:
+Root servers resolve top level domains... (.ie, .com, .net, ...)
+TLD servers are repsonsible for their respective sub-domains (google.ie, seamus-woods.com, ...)
+Authoritative servers are responsible for their sub-domains (foo.bar.net, ...)
+
+(d)
+What would the implications be if all the DNS servers worldwide went offline at the same time?
+
+Answer:
+If all of the DNS servers in the world went down at the same time, domain names would be 
+unresolvable, however if you knew the exact IP address of the domain you could still access it.
+
+
+
+QUESTION 5:
+(a)
+Describe in detail the operating and benefit provied by a Content Distribution Network (CDN):
+
+Answer:
+CDN's were built to aleviate the stress that is on the internet.
+It works by caching links to certain content. 
+Example.. A user in Japan wants to access a website in Milan:
+
+Before CDNs:
+	The user in Japan would need their connection to hop around the world to get to the 
+	endpoint for the Milan site.
+
+With CDNs:
+	The CDN server neares the user in Japan will have cached the Milan site's content
+	and deliver it to the JApan user without their connection travelling around the globe
+	saving much needed time and resulting in much greater performance. 
+
+Advantages of a business using a CDN:
+	- Performance
+	- Availability
+	- Intelligence
+	- Security
+
+
+(b)
+What is the role of DNS in a Content Distribution Network (CDN)?
+
+Answer:
+The DNS smartly chooses the best server to handle the clients request.
+Example: If a user is trying to access a site while in Ireland, the DNS will resolve the sites
+	 IP address to their server in Ireland, however is a user is trying to access a site
+	 while in the US, the DNS will resolve the sites IP address to their server in US.
+
+
+(c)
+Does the DNS have to be modified to support the CDN?
+
+Answer:
+You could say that the DNS would need to be modified to accept alternative query names or 
+the contrary that it doesn't need to be modified as it will use the authoritative server to
+determine the client's location and then returns the CDN server selection. 
+
+
+(d)
+What information, if any, must a CDN provide to a DNS?
+
+Answer:
+Not entirely sure, but maybe the IP address of the request, so as to know the general location
+of the client and return the server closest to that location. 
+Server that the CDN points to?
+
+
+
+QUESTION 6:
+(a)
+What is the role of a SIP registrar?
+
+Answer:
+Session Initiation Protocol(SIP) is a communications protocol for signalling and controlling
+multimedia communication sessions in applications of internet telephony for voice and video 
+calls, in private IP telephone systems as well as instant messaging over IP networks. 
+
+It defines a specific format of the messages exchanged and the sequence of communicatons
+for operation of the participants. 
+
+
+(b)
+How is the role of a SIP registrar different from that of a home agent in Mobile IP?
+
+Answer:
+?
+
+
+
+QUESTION 7:
+How can multimedia application recover from packet loss without the need for retransmission?
+Describe 3 methods.
+
+Answer:
+?
+
+
+
+QUESTION 8:
+(a)
+In BitTorrent, suppose Alice provides chunks to Bob throughout a 30-second interval.
+Will Bob necessarily return the favor and provide chunks to Alice in the same interval?
+
+Answer:
+Not necessarily.
+Bob will only supply data to his top 4 peers and a random 5th peer.
+If Alice doesn't provide enough data to be in Bob's top 4, Bob may not be sending data in return.
+
+
+(b)
+Consider Trudy joins the BitTorrent without processing any chunks. 
+Without any chunks, she cannot become a top-four uploader for any other peers, since she has
+nothing to upload. 
+Then how will True get her first chunk?
+
+Answer:
+Firstly, there are people called seeds in BitTorrent, who will simply not expect anything in 
+return for sending any packets, as they already have the completed file.
+Others will have different leach settings and will only expect 1 packet in return for every 
+4 sent, or some will have a 1:1 ratio for sent and received packets.
+So there will always be a seed with a completed file that will supply a new user with their
+first chunk of data.

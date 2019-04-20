@@ -1,0 +1,709 @@
+CRYPTOGRAPHY:
+
+- The original data to be transferred is called plaintext(P).
+  Encrypted version is called ciphertext(C).
+
+- An encryption function operates on P to produce C.
+  E(P) = C
+
+- In the reverse process, a decryption function operates on C to produce P.
+  D(C) = P
+
+- The following identity must hold true for the cryptosystem to function correctly:
+  D(E(P)) = P
+
+- Cryptographic Keys:
+	- All modern encryption algorithms use a key(K).
+	  The key can take on a range of possible values, called the key space.
+
+	- The encryption and decryption functions now become:
+	  E_k(P) = C and D_k(C) = P
+
+- Caesar Cipher:
+	- Is a monoalphabetic substitution.
+
+	- Attacks:
+		- Commonly occuring characters.
+		- Commonly occuring bigrams (th, he, in).
+		- Domain-specific buzz words.
+
+- Vigenere Cipher:
+	- Some protection from the previous attacks can be gained by using a
+	  polyalphabetic cipher.
+		- Create a 2d matrix of 26 characters (26*26).
+		- Pick a key (e.g. AFGANISTANBANANASTAN).	
+		- Use row A to encrypt the first letter, row F the second etc.
+
+- Transposistion Cipher:
+	- Reorders the symbols, but does not disguise them.
+
+	- The plaintext is written horizontally in rows, and the ciphertext is read out in 
+	  columns, starting with the column whose key is lowest.
+
+- Components of a Modern Block Cipher:
+	- Lots of diagrams.. should do these in copy:
+	
+	- P-box..(Straight permutation, Compression permutation, Expansion permutation)
+	- Substitution.
+	- Exclusive-OR.
+	- Shift.
+	- Swap.
+	- Split.
+	- Combine.
+
+
+
+SYMMETRIC-KEY ENCRYPTION:
+
+- The sender and receiver both use the same:
+	- Secret key.
+	- Cryptosystem.
+
+- The sender uses the key to encrypt the message.
+  The receiver uses the same key to decrypt the message.
+
+- Examples include DES, IDEA and AES.
+
+- Key Management:
+	- The main problem is getting the sender and receiver to agree on a secret key,
+	  without anyone else finding out.
+
+- Data Encryption Standard(DES):
+	- The algorithm is easily implemented in hardware.
+	  Software implementations are also widely available.
+
+	- DES is a block cipher that operates on a single chunk of data (8 bytes) at a time.
+	  It produces an 8 byte output.
+
+	- They key length is 56 bits, often expressed as an 8-character string, with the extra
+	  bits used as a parity check.
+
+	- The algorithm has 19 distinct stages:
+		- Reorders the bits of the 64-bit input block by applying a fixed permutation
+		  (P-box from above).
+
+		- The last stage is the exact inverse of this permutation.
+
+		- Penultimate stage exchanges the leftmost 32 bits with the rightmost.
+
+		- Remaining 16 stages are called 'rounds':
+			- Functionally identical, but their input is a quantity computed from
+			  the key and the round number.
+
+			- The round key is 48 bits long.
+
+- Cracking DES:
+	- 56 bits is a short key, so we can brute force:
+		- 2^56 encryptions to try all keys.
+		
+		- Special chips can crack 4M keys/s.
+		
+		- A $1M DES cracking machine could break it in a few hours.
+	
+	- Improvements: Use a Triple DES (3DES):
+		- Makes use of two keys (112 bits) or three keys (168 bits).
+		
+		- Uses EDE or DED mode.
+
+- Modes of Operation for Block Ciphers:
+	- DES uses Electronic Code Book(ECB) mode:
+		- Each 64-bit block is encoded independently of all other blocks.
+		  Block synchronisation between the T_x and Rev is not necessary.
+
+		- Bit errors from noisy transmission only affect the corresponding blocks.
+		
+		- Block ciphers operating in ECB can be parallelised (High speed implementation).
+
+- ECB Problems: 
+	- ECB mode encrypts in a highly deterministic manner.
+	  Identical plaintext blocks result in identical ciphertext blocks, as long as the 
+	  same key is used.
+
+- ECB Substitution Attacks:
+	- Each block is encrypted independently of all other blocks, so they can be reordered
+	  maliciously.
+
+- Cipher Block Chaining Mode (CBC):
+	- In CBC mode, each block of plaintext is XOR'd with the previous ciphertext block
+	  before being encrypted.
+	  This makes each ciphertext block dependent on all previous blocks.
+
+	- To make each message unique, an initilisation vector(IV) must be used in the 
+	  first block.
+
+	- If we encrypt the same plaintext with different IVs, two resulting ciphertext
+	  sequences will look completely unrelated to each other.
+
+	- The IV does *not* need to be secret. It is only used once (a nonce).
+
+- Output Feedback Mode (OFB):
+	- In OFB, a block cipher is used to build a stream cipher encryption scheme.
+	  They key stream is generated in a blockwise fashion instead of bitwise.
+
+	- The cipher outputs 'b' in key stream bits, where 'b' is the width of the block 
+	  cipher used. 
+	  We can then encrypt 'b' plaintext bits using the XOR operation.
+
+	- The OFB mode forms a synchronous stream cipher, as the key stream does not 
+	  depend on the plain or ciphertext.
+
+	- Encryption and decryption are the same operation.
+
+	- In OFB mode, block cipher computations are independent of the plaintext, so we
+	  can pre-compute several blocks of the key stream material.
+
+- Cipher Feedback Mode (CFB):
+	- CFB is similar to OFB, except the ciphertext is fed back in as opposed to the 
+	  output of the block cipher. 
+
+	- CFB is an asynchronous stream cipher, since the stream cipher output is also a 
+	  function of the ciphertext.
+
+	- A variant of CFB can be used in situations where short plaintext blocks are to
+	  be encrypted.
+	  Plaintext generated by the keyboard is typically only one byte long.
+	  In this case, only 8 bits of the key stream are used to encryption, and the ciphertext
+	  is a single byte. 
+
+- The Vernam Cipher:
+	- The simplest and most secure stream cipher is the one-time pad.
+
+	- It chooses a key stream(k) that is randomly chosen for each encipherment.
+	  It makes use of the XOR operator.
+
+	- **DIAGRAM** (todo in copy..)
+	  (Impromptu ascii art attempt..):
+	   _________________________________________________________________
+	  |  								    |
+	  |		Random Sequence					    |
+	  |		 bit generator 					    |
+	  |		      |						    |
+	  |		      |____Secure_key-exchange_____		    |
+	  |		      |				   |		    |
+	  |		      v      _______ci_______      v		    |
+	  |	 pi(1bit)--->(+)--->(Insecure Channel)--->(+)--->pi(1bit)   |
+	  |		  						    |
+	  |		  Encryption		       Decryption	    |
+          |_________________________________________________________________|
+
+	  Absolutely not worth the time.
+	  *(k >= p)*
+
+- Advanced Encryption Standard (AES):
+	- AES is a symmetric cipher with variable ey and block sizes of 128(most common),
+	  192 and 256 bits.
+
+	- It supports fast encryption and decryption in software and can be implemented 
+	  efficiently in smartcards.
+
+	- The cipher consists of between 10 and 14 rounds (N_r) depending on the key length(N_k)
+	  and the block length (N_b).
+
+	- A plaintext block X undergoes 'n' rounds of operations to produce an output block Y.
+	  Each operation is based on the value of the n^th round key.
+
+	- Round keys are derived from the cipher key by first expanding the key, then selecting
+	  part of the expanded key each round. 
+
+
+
+ASSYMETRIC-KEY ENCRYPTION:
+
+- In public key cryptography, each user generates a pair of keys:
+	- Public key(K+):  Published and widely distributed.
+	- Private Key(K-): Kept secret.
+
+- This solves the management problem assosciated with symmetric key cryptosystems.
+
+- Examples:
+	RSA, Diffie-Hellman, ElGamal, ECC.
+
+- Properties:
+	- Must be computationally easy to encipher or decipher a message given the 
+	  appropriate key.
+	
+	- Must be computationally infeasible to derive the private key from the public key.
+
+	- Messages are encrypted with a public key, and decrypted with the corresponding
+	  private key.
+
+- Rivest-Shamir-Adleman Encryption (RSA):
+	- RSA's security is based on the difficulty of factorising very large numbers.
+
+	- Easy: Calculate product of two prime numbers.
+
+	- Hard: Calculate prime factors from the product.
+
+- Modular Arithmetic:
+	- Most cryptographic algorithms are based on arithmetic with a finite set of numbers.
+
+	- a ≅ r mod m ... (a is congruent to r mod m if m divides a-r).
+	  	- Where m = modulus,
+			r = remainder.
+	
+	- Example:
+		- 42 = 4 * 9 + 6	      
+		  42 - 6 = 4 * 9
+		  42 ≅ 6 mod 9
+
+- Multiplicative Inverse:
+	- The integers Z modulo m is denoted Z_m = {0,1,2,...,m-1}
+	  Z_25 = {0,1,2,...,24}
+	  13 + 16 ≅ 4
+	  29 ≅ 4 mod 25.
+
+	- The multiplicative inverse of a modulo m is an integer x (element of Z_m) such that:
+	  ax ≅ 1 mod m.
+	  12 * 3 ≅ 1 mod 25 => x=3.. is the multiplicative inverse of m=25 where a=12.
+
+	- The multiplicative inverse only exists for an element a (element of Z_m) iff:
+	  gcd(a,m) = 1.
+
+- The Extended Euclidean Algorithm (EEA):
+	- The EEA is a method for computing the greatest common divisor of two integers.
+	  It computes integers x and y such that ax + by = gcd(a,b).
+
+	- Method:
+		- Repeatedly divide the divisor by the remainder until the remainder is 0:
+		  Example: gcd(102,38)
+		  102 = 2(38) + 26........(102/38=2 remainder=26)
+		  38 = 1(26) + 12.........(38/28 =1 remainder=12)
+		  26 = 2(12) + 2..........(26/12 =2 remainder =2)
+		  12 = 6(2) + 0...........(12/2  =6 remainder =0)
+		  So, gcd(102,38)=2
+
+		- Reverse steps of EEC to find these integers x and y. 
+		  Start with the GCD:
+		  2 = 26 - 2(12) 
+		    = 26 - 2(38 - 1(26))
+		    = 3(26) - 2(38)
+		    = 3(102 - 2(38)) - 2(38)
+		    = 3(102) - 8(38)
+		    = 102(3) + 38(-8) = gcd(102,38)
+		  x=3, y=-8
+
+	- The modular multiplicative inverse of a modulo 'm' can be found with the EEA:
+		- s*r0 + t*r1 = gcd(r0, r1)
+		  s*r0 + t*r1 = 1
+		  s*0  + t*r1 = 1 mod r0
+		  t = r1^-1 * mod r0
+		
+		- Example: gcd(11,4) = 1
+		  11 = 2(4) + 3
+		   4 = 1(3) + 1
+		   3 = 3(1) + 0
+	
+		- Back substitution...
+		  1 = 4 - 1(3)
+		    = 4 - 1(11 - 2(4))
+		    =-1(11) + 3(4)
+		  t = 3
+		  4(3) = 1 (mod 11)
+
+- Euler's Totient Function:
+	- Φ(m) is the number of posiitive integers that are less than m, and
+	  relatively prime to m.
+
+	- 'a' and 'm' are relatively prime if gcd(a,m) = 1.
+
+	- Φ(10) = 4...(1,3,7,9 are relatively prime to 10)
+	  Φ(21) = 12..(1,2,4,5,8,10,11,13,16,17,19,20 are relatively prime to 21)
+	  Φ(m) = m-1 when m is prime.
+
+- Euler's Phi Function:
+	- Let m have the following canonical factorisation:
+	  m = p1^(e1) * P2^(e2) * ... * pn^(en)
+	  Where:
+		- pi are distinct primes.
+		- ei are positive integers.
+
+	- Φ(m) = prodof{n}{i=1}(pi^(ei) - pi^(ei - 1))
+
+	- Example: Φ(240)...(Hint: 240 = 2^4 * 3 * 5)
+	  Φ(240) = (2^4 - 2^3) * (3^1 - 3^0) * (5^1 - 5^0)
+		 = (16-8) * (3-1) * (5-1)
+		 = 8 * 2 * 4
+		 = 64
+
+- Fermat's Little Theorem:
+	- Let 'a' be an integer and 'p' a prime, then:
+	  a^p 		≅ a mod p
+	  a^(p-1) 	≅ 1 mod p
+	  a*a^(p-2) 	≅ 1 mod p
+	  a^(-1) 	≅ a^(p-2) mod p
+	  We now have a way for inverting an integer 'a' modulo a prime 'p'
+
+	- Example: Compute 4^(-1) mod 11:
+	  4^(-1) ≅  4^(11-2) mod 11........(via a^(-1) ≅ a^(p-2) mod p)
+	  4^(-1) ≅  4^(9) mod 11
+          4^(-1) ≅  262144 (mod 11) = 3
+
+
+
+RSA ALGORITHM:
+
+- Method:
+	1. Choose two large distinct primes 'p' and 'q'.
+	2. Compute the product n = p*q.
+           Φ(n) = Φ(p) * Φ(q) = (p-1) * (q-1)...(See Euler's Totient Function).
+	3. Randomly choose an encryption key 'e', less than 'n' that has no common factors
+	   with Φ(n).
+		- 'e' and Φ(n) are relatively prime.
+		- 'e' is invertible iff gcd(e, Φ(n)) = 1
+	4. Compute the decryption key 'd' such that: 
+		- e * d ≅ 1  mod Φ(n)
+		- d ≅ e^(-1) mod Φ(n)
+		- d ≅ e^(-1) mod (p-1)(q-1)
+
+- RSA Usage:
+	- The numbers 'e' and 'n' are the public key.
+	  The number 'd' os the private key.
+
+	- Break the plaintext message into a number of blocks and represent each block
+	  as an integer.
+
+	- Encryption: ciphertextBlock = (plaintTextBlock)^e mod n
+	
+	- Decryption: plaintextBlock = (cipherTextBlock)^d mod n
+
+	- Key sizes can be 1024, 2048, 3072, 7680 bits.
+	  3072 is considered secure in 2015.
+
+- RSA Example:
+	- Let p=3 and q=11.
+	
+	- Using n = 3*11 = 33:
+		Φ(n) = (p-1)(q-1) = 2*10 = 20
+	
+	- Choose e=3, as 'e' and Φ(n) have no common factors.
+	
+	- Solving e * d ≅  1 mod 20 and d < 20:
+	  3 * d ≅  1 mod 20
+
+	  s*20 + t*3 = gcd(20,3)
+	  gcd(20,3 = 1)
+	  20 = 6(3) + 2
+	   3 = 1(2) + 1
+           2 = 2(1) + 0
+
+	  1 = 3 - 1(2)
+	  1 = 3 - 1(20 - 6(3))
+	  1 = 3 - 20 + 6(3)
+	  1 = 7(3) - 1(20)
+	  
+	  So, s=-1 and t=7
+	 
+	  Therefore d=7.
+
+	- Since n = 33 ~ 2^5, the plaintext can be at most five bits long. Each block 
+	  can only contain a single character.
+
+- Fast Exponentiation:
+	- A Straightforward way of exponentiation is like this:
+		x -> x^2 -> x^3 -> x^4 -> ...
+	
+	- Alternatively we can compute:
+		x -> x^2 -> x^4 -> x^8 -> ...
+	
+	- What about x^26?
+		x -> x^2 -> x^3 -> x^6 -> x^12 -> x^13 -> x^26
+
+- Square and Multiply Algorithm:
+	- Based on scanning the bits of the exponent from the most significant to least 
+	  significant (L -> R).
+
+	- In every iteration:
+		1. The current result is squared.
+		2. If (current_bit == 1),
+		   multiplication of the current result by x is executed, following the squaring.
+
+	- Example: 
+	  x^26 = x^(11010_2)
+
+	  (x)			.. Initial setting - bit processed: 1 
+	  (x)^2			.. Square.. bit processed: 1 
+	  (x^2)*x		.. Multiply.. bit processed was 1.
+	  (x^3)^2		.. Square.. bit processed: 0
+	  (x^6)^2		.. Square.. bit processed: 1
+	  (x^12)*x		.. Multiply.. bit processed was 1.
+	  (x^13)^2		.. Swaure.. bit prcoessed: 0
+	  (x^26)
+
+
+
+FINDING LARGE PRIMES:
+
+- The general approach is to generate integers at random which are then checked for primality.
+
+- Chance that a randomly picked integer 'i' is prime is 1/ln(p)
+  In practice, we only test odd numbers, so the probability is double.
+
+- For RSA with 1024-bit modulus 'n', the primes 'p' and 'q' should have length 512 bits.
+  P = 2/ln(2^512) = 2/(512*ln(2)) = 1/177
+
+- Primality Tests:
+	- A simple primality test can be based on Fermat's Little Theorem.
+	  a^p ≅ a mod p
+	  a^(-1) ≅ 1 mod p
+
+	- However, there ae certain composite numbers which may fulfill the above condition.
+	  In order to detect them, the algorithm runs s times with different values of a.
+
+	- Example: Is 221 a prime number?
+	  let a = 2
+	  2^(221-1) ≅  1 mod 221 should be 0 if prime..
+	  Not prime.
+
+- Miller-Rabin Primality Test:
+	- Given the decomposition of an odd prime candidate p:
+	  	p - 1 = 2^u * r
+	  Where r is odd.
+
+	- If we can find an integer such that:
+	  	a^r != 1 mod p, and, a^(r(2^j)) != -1 mod p
+	  for all j = {0,1,...,u-1}, then p is probably a prime.
+
+	- Example:
+		- If p=13 then p-1 = 4(3) = (2^2)(3), so u=2 and r=3
+	 	  a^3 ≅  1 mod p, or, 
+		  a^3 ≅ -1 mod p, or, 
+		  a^6 ≅ -1 mod p..... for each a from 1 to 12.
+		
+		- Is 561 prime?
+		  if p=561 and p-1=16(35) = 2^4(35), so u=4, r=35.
+		  a^35 ≅  1 mod 561
+		  a^35 ≅  1 mod p, or,
+		  a^35 ≅ -1 mod p, or,
+		  a^70 ≅ -1 mod p, or,
+		  a^140≅ -1 mod p.
+
+- RSA in practice:
+	- RSA encryption is deterministic.
+
+	- In practice, RSA has to be used with a padding scheme. 
+	  Optimal Asymmetric Encryption Padding(OAEP) for padding RSA messages are specified.
+	  This is standardised in the Public Key Cryptography Standard #1 (PKCS #1).
+
+- RSA Malleability:
+	- A crypto scheme is said to be malleable if an attacker is capable of transforming
+	  the ciphertext into another ciphertext, which leads to a known transformation of 
+	  the plaintext.
+	
+	- This is easily achieveable in the case of RSA if the attacker replaces the ciphertext
+	  y by s^e*y, where s is some integer:
+	  y ≅ x^e mod n.
+	
+	- The receiver computes:
+	  (s^e*y)^d ≅  s^(ed)*x^(ed) ≅ sx mod n.	
+ 	  
+	- If x were an amount of money to be transferred, choosing s=2 could double the amount
+	  of money in a way that goes undetectable by the receiver.
+
+- RSA Side Channel Attacks:
+	- Exploit information about the private key which is leaked through physical channels 
+	  such as power consumption. 
+
+	- Short and long high-activity intervals are explained by the square and multiply 
+	  algorithm:
+		- If an exponent bit has the value 0, just a square is performed.
+		
+		- If an exponent bit had the value 1, square and multilpication is performed.
+
+- Hybrid Schemes:
+	- Asymmetric-key algorithms are *not* a replacement for symmetric-key algorithms such 
+	  as DES or AES. Rather, they supplement AES or any other fast bulk encryption cipher.
+
+	- We can use a public key algorithm to securely transfer a session key 'k'. 
+	  This session key can be used to bulk encryption & decryption. 
+
+- An Important Property of RSA:
+	- The following commutative property will be useful later:
+	  K_(b-)((K_(b+)(m))) = m = K_(b+)((K_(b-)(m)))
+
+
+
+MESSAGE AUTHENTICATION & INTEGRITY:
+
+- Authentication validated that a message came from the original source.
+  Integrity verifies that the message has not changed.
+
+- A message digest / cryptographic hash is a strong digital fingerprint of a message:
+	- Takes an input 'm' and produces a fixed-length vale H(m)..128/160/256 bits.
+
+	- Computationally infeasible to find two different messages x and y such that:
+	  H(x) = H(y)
+	
+	- Examples:
+		- MD2, MD4, MD5.
+		- SHA-1, SHA-2.
+
+- Digital Signatures:
+	- The sender digitally signs the document establishing that they are the document
+	  owner / creator.
+
+	- The recipient can prove to someone that the sender, and no one else, must have 
+	  signed the document.
+	  It is verifiable and non-forgeable.
+
+		Alice:	Message(m) ---> Compute H(m) ---> s = K_a*(H(m)) ---> c = K_s+(m)
+										  |
+										  |
+										  | (c,s)
+										  |
+										  |
+	   Bob:	 Message(m) <--- Verify H(m) = H(m) <--- H(m) = K_a+(s) <--- m = K_s*(c)	
+
+- Key Management:
+	- When Alice obtains Bob's public key, how does she know that it's really his key?
+	  One way is to enlist the services of a trusted third part(TTP).
+
+- X.509 Certificates:
+	- The TTP constructs a message refferred to as a certificate:
+	
+	  | Subject | Public_key | Validity_Period | Issuer | Other_Fields | Signature_of_TTP |
+
+	- Contains a digital signature on the above fields with the private key of the TTP.
+
+	- This system assumes that every user is equipped with the public key of the TTP.
+	  This allows everyone to verify the digital signature on the certificate.
+	  Guarantees that the public key is associated with the names user.
+
+- Certification Hierarchy:
+	- TTPs that issue certificates are referred to as certification authorities(CAs).
+
+	- The root CA issues certificates only to othe CAs.
+	  Each user of the system needs only the public key of the root CA.
+
+
+
+DIFFIE-HELLMANN KEY EXCHANGE(DHKE): 
+
+- DHKE allows strangers to establish a shared symmetric key without having to meet, and
+  without the need for a cryptosystem to be in place.
+
+- The idea behind DHKE is:
+	- Exponentiation in the multiplicative group (Z_p)^+ (p is a prime) is a one-way function.
+
+	- Exponentiation is commutative:
+	  k = (a^x)^y = (a^y)^k mod p
+
+- The value 'k = (a^x)^y = (a^y)^k mod p' is a joint secret. 
+  It can be used as a session key between the two parties.
+
+- DHKE Usage:
+	- Securely choose the domain parameters:
+		1. Choose a large prime 'p'.
+
+		2. Choose an integer 'alp' which is an element of {2,3,...,p-2}.
+
+		3. Publish 'p' and 'alp'.
+
+- Excercise:
+	- Generate a DH key using the domain parameters p=29 and alp=2.
+	  Assume that a=5 and b=12.
+
+	  A = 2^5  mod 29 = 3
+	  B = 2^12 mod 29 = 7
+	  K_(AB) = 7^5 mod 29 = 3^12 mod 29 = 16
+
+- Security of DHKE
+	- The domain parameter 'p' should have a length of at least 1024 bits.
+
+	- 'alp' should be a primitive element or generator of the group G, whose powers modulo 
+	  'p' generate all integers from 1 to p-1.
+	  Every element 'a' of G can be written as: a^i = a.
+
+	- Is 3 a primitve element modulo (Z_7)^*:
+		3^1 mod 7 = 3
+		3^2 mod 7 = 2
+		3^3 mod 7 = 6
+       		3^4 mod 7 = 4
+		3^5 mod 7 = 5
+          	3^6 mod 7 = 1
+	  Yes.
+
+- Man-in-the-Middle Attack (MITM):
+	- Alice computes the key 'g^(xz) mod n', and so does Trudy for messages to Alice.
+	  Bob computes the key 'g^(yz) mod n', and so does Trudy for messages to Bob.
+
+	- Alice thinks she is talking with Bob and establishes a session key with Trudy, 
+	  as does Bob.
+	  This is known as the bucket brigade attack.
+
+	- The Diffie-Hellman Station-to-Station (STS) protocol is uses to stop MITM attacks.
+	  (Used in practice)
+
+- Finite Fields:
+	- A finite field (Galois field), is a set with a finite number of elements in which 
+	  we can add, subtract, multiply and invert.
+
+	- A group is a set with one operation and the corresponding inverse operation:
+		- If the operation is addition, the inverse is subtracting.
+
+		- If multiplication, inverse is division(multiplication with inverse).
+
+- Groups:
+	- A group is a set of elements G with an operation • which combines two elements of
+	  G and has the following properties:
+		- Group operation • is closed:
+		  a • b = c... (c will be an element of G) 
+
+		- Group operation • is assosciative:
+		  a • (b • c) = (a • b) • c
+
+		- There is an identity element 1:
+		  a • 1 = 1 • a
+	
+		- For each a in G there exists an inverse element a^-1:
+		  a • a^-1 = a^-1 • a = 1
+
+		- The group is commutative:
+		  a • b = b • a
+
+- Fields:
+	- A field F is a set of elements with the following properties:
+		- All elements of F form an additive group with the group operation + and
+		  the neutral element 0.
+
+		- All elements of F except 0 form a multiplicative group with the group operation
+		  * and the neutral element 1.
+	
+		- When the two group operations are mixed, the distributivity law holds:
+		  a * (b + c) = a * b + a * c
+
+- Prime Fields:
+	- The set Z_p (p is a prime) is denoted as GF(p) and is referred to as a prime field,
+	  (aka) a Galois field with a prime number of elements.
+
+	- Elements in the field GF(p) can be represented by integers 0,1,...,p-1:
+		- All non-zero elements of GF(p) have an inverse.
+	
+		- Arithmetic in GF(p) is done modulo p.
+		  (e.g.) GF(5) = {0,1,2,3,4}.
+
+- Finite Groups:
+	- A group (G, •) is finite if it has a finite number of elements. e.g. (Z_n,+), (Z_n,*).
+
+	- We denote the cardinality / order of the group G by |G|.
+		1. Z_n = {0,1,2,...,n-1}	|Z_n| = n-1
+		2. (Z_n)^* consists of intgers i = 0,1,...,n-1 for which gcd(i,n)=1
+		   |(Z_n)^*| = Φ(n)
+		   Φ(9) = 3^2 - 3^1 = 6 (i.e. elements {1,2,4,5,7,8})
+
+	- The order ord(a) of an alement 'a' of a group (G, •), is the smallest positive 
+	  integer, such that:
+	  a^k = a • a • ... • a = 1.
+
+	- Example:
+		
+
+
+
+
+
+
+
+
+
+
+
