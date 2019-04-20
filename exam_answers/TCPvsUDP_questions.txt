@@ -1,0 +1,241 @@
+QUESTION 1:
+Distinguish between UDP and TCP in terms of reliable data transfer, header size
+and connection overheads.
+
+Answer:
+- Reliable Data Transfer:
+	- TCP:
+		- Very reliable.
+	- UDP:
+		- Unreliable.
+- Delivery:
+	- TCP:
+		- In-order.
+	- UDP:
+		- Unordered.
+- Header:
+	- TCP:
+		- 20-60 bytes
+		- Src Port
+		- Dest Port
+		- Seq Num
+		- Ack Num
+		- Data offset
+		- Reserved
+		- Control flags
+		- Window size
+		- Checksum
+		- Urgent data pointer
+		- Optional data
+	- UDP:
+		- 8 bytes
+		- Src port
+		- Dest port
+		- Length
+		- Checksum
+- Connection overhead:
+	- TCP:
+		- Yes
+	- UDP:
+		- No
+
+
+QUESTION 2:
+Explain the difference between TCP & UDP under the topics:
+	- Connection
+	- Function
+	- Usage
+	- Reliability
+	- Packet Ordering
+	- Speed or Transfer
+	- Data Flow Control
+	- Error Checking
+	- Handshake
+	- Examples
+
+Answer:
+- Connection:
+	- TCP:
+		- P2P Connection
+	- UDP:
+		- Connectionless
+- Function:
+	- TCP:
+		- Connection based
+	- UDP:
+		- Used for message transport and transfer.
+- Usage:
+	- TCP:
+		- High Reliability Transmission.
+	- UDP: 
+		- Fast, efficient transmission time. 
+- Religability:
+	- TCP:
+		- Very Reliable.
+	- UDP:
+		- Unreliable.
+- Pack Ordering:
+	- TCP:
+		- In Order
+	- UDP:
+		- Unordered
+- Speed of Transfer:
+	- TCP:
+		- Slow, lots of overhead
+	- UDP:
+		- Fast, not so much overhead
+- Data flow control:
+	- TCP:
+		- Set Window Size
+	- UDP:
+		- None
+- Error Checking:
+	- TCP:	
+		- Yes and Recovery
+	- UDP:
+		- Yes but no recovery.
+- Handshake:
+	- TCP 
+		- 3 way handshake(SYN, SYN-ACK, ACK)
+	- UDP
+		- None, connectionless
+- Examples:
+	- TCP
+		- Loading web pages
+	- UDP
+		- Video call, anything that can be lossy. (DNS, DHCP)
+
+
+
+QUESTION 3:
+(a) Describe the functionality provied by UDP & TCP.
+
+Answer:
+Functionality provided by UDP & TCP:
+TCP:
+	- Is reliable.
+	- Is Delivered in order.
+	- Header is 20-60 bytes..(includes: src port, dest port, seq num, ack num, data offset,
+					    reserved, control flags, window size, checksum, urgent
+					    data pointer, optinal data).
+	- Has connection overhead.
+UDP:
+	- Not reliable
+	- Delivered unordered
+	- Header is 8 bytes..(includes: src port, dest port, length, checksum)
+	- Has no connection overhead.
+
+
+(b)
+Which one would you use for multimedia communications and why?
+
+Answer:
+UDP. 
+Since multimedia communictions need to be fast, and doesn't really matter if they're lossy since
+they can still be interpreted. Doesn't need to be connection oriented.
+
+
+
+QUESTION 4:
+Would TCP or UDP be preferable for IP Telephony & IP Video Conferencing?
+
+Answer:
+TCP:
+	- Must buffer for unacknowledged segments.
+	- Connection dies if too many packets are lost.
+	- Line becomes garbled due to too many packets trying to recover.
+UDP:
+	- Missing packets don't affect quality that much.
+	- Faster and better for real time.
+
+Therefore, UDP.
+
+
+
+QUESTION 5:
+A Web server using persistent connections is running on host C on port 80.
+It is receiving requests from both host A and B.
+Are all the requests being sent through the same socket on host C?
+If they are being passed through different sockets, do both the sockets have port 80?
+
+Answer:
+For a persistent connection, socket pairs are used. 
+Socket pairs are defined by:
+	- Source IP
+	- Source Port num
+	- Destination IP
+	- Destination Port num
+And assigned a socket address. 
+Once a host has received this numerical descriptor it can only then start communicating via 
+this socket. 
+For this reason, requests from A and B will always pass through different sockets. 
+Although the destination port number (80) will be the same for A and B.
+The source IP address and possible the port number will be different so would be given
+different socket addresses.
+
+
+
+QUESTION 6:
+(a)
+Draw the FSM for the receiver that corresponds to this sender's FSM.
+
+Answer:
+**DONE IN COPY**
+
+
+(b)
+If host A sends two packets to host B, the first with sequence number 65 and the second with
+sequence number 92, how much data is in the first segment?
+
+Answer:
+65 bytes as it is the first packet.
+
+
+(c)
+If the first segment is lost and the second segment arrives, what will the ACK from Bs
+acknowledgement number be?
+
+Answer:
+ACK 93, a sequence number 92 is received, B is now expecting 92+1=93.
+
+
+
+QUESTION 6:
+With the aid of an example, describe the TCP 'Fast Retransmit' algorithm and its advantages.
+
+Answer:
+Packets are sent back to back and lost packets are determined via duplicate ACKs.
+
+**DIAGRAM IN COPY**
+
+If sender received 3 ACKs from the same data commonly reffered to as 'Triply Duplicate' ACKs, 
+resends segment of that sequence number.
+Do not wait for the timeout as can be relatively long.
+
+
+
+QUESTION 7:
+Why is TCP congestion control referred to as an additive-increase, multiplicative-decrease
+(AIMD) form of congestion control.
+
+Answer:
+The congestion window determinies the max amount of bytes that can be outstanding at any given 
+time and is set to the Max Segment Size (MSS) allowed on the connection. 
+If all segments are received and ACKs reach the sender on time, the congestion window is 
+increased by 1 MSS. 
+If a packet is lost, the congestion window is cut in half. 
+
+Rount_Trip	Sequence_Number
+1		1
+2		2,3
+3		4,5,6
+4		7,8,9,10
+5		10,11			...(Packet 10 was lost)
+6		12,13,14
+7		15,16,17,18
+8		19,20,21,22,23
+9		24,25,26,27,28,29
+10		25,26,27		...(Packet 25 was lost)
+
+
+
