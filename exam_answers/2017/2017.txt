@@ -1,0 +1,160 @@
+QUESTION 1:
+(a)
+Suppose Client A requests a web page from Server S through HTTP and its socket is assosciated
+with port 33000.
+
+(i) What are the src and dest ports for the segments sent from A to S?
+
+(ii) Can Client A contact Server S using UDP as the transport protocol?
+
+(iii) Can Client A request multiple resources in a single TCP connection?
+
+Answer:
+(i)
+The source port will be 33000.
+The destination port will be the port assosciated with the socket of S.
+
+(ii)
+Typically you wouldn't do this but it is possible.
+The reason you wouldn't want to do this is because UDP is unreliable. 
+
+(iii)
+Yes, this can be done over a persistent HTTP connection. 
+
+(b)
+Describe the basic server hierarchy within the DNS.
+Outline the minimum steps required in terms of DNS entries (including web and email domains), 
+that are required to register your new start-up 'net-workutopia.com'
+
+Answer:
+- Root servers resolve top level domains (.ie, .com, .org, ...)
+	- TLDs responsilbe for their respective subdomains(google.ie, ...)
+		- Authoritative servers are responsible for their subdomains(foo.bar.net, ...)
+
+- Register the new name at a DNS registrar:
+	- Provide names and IP addresses of the authoritative name server(primary and secondary).
+	  Registrar inserts two RRs into .com TLD server:
+	 	- [website.com, NS, dns1.website.com]
+		- [nds1.website.com, A, 212.212.212.1]
+	- Create:
+		- Autoritative server type A record for www.website.com
+		- Type MX record for website.com
+		  [mail1.website.com, A, 212.212.212.2]
+
+(c)
+What are the services provided by the DNSSEC protocol?
+Describe how DNSSEC validation takes place within a zone by detailing the various RRs, RRsets
+and Signature Keys that are required to secure a domain. 
+
+Answer:
+Prodives origin authenticity and integrity assurance for DNS data by making use of 
+digital signatures.
+
+DNSSEC add a number of new RR types such as:
+	- RRSIG:	Contains a cyprtographic signature
+	- DNSKEY:	Contains a public signing key
+	- DS:		Contains a has of a DNSKEY record
+
+The first step towards securing a zone with DNSSEC is to group all records of the same type 
+into a RRset (e.g.) All AAAA records are bundled into a AAAA RRset.
+
+DNSSEC Validation:
+	- Request the desired RRset, which returns the corresponding RRSIG record.
+	- Request the DNSKEY record conatinig the public ZSK and public KSK, which
+	  returns the RRSIG for the DNSKEY RRset.
+	- Verify the RRSIG of the requested RRset with the public ZSK.
+	- Verify the RRSIG of the DNSKEY RRset with the public KSK.
+
+(d)
+Distinguish between centralized and decentralized P2P services.
+
+Answer:
+Decentralised P2P network interconnects nodes sharing resources amongst each other without any
+centralised server. 
+Decentralised P2P networks prioritise robustness and security, not single point of failure. 
+Centralised P2P networks have a central server.
+
+(e)
+Consider distributing a file F = 15Gbits to N peers.
+The server has an upload rate of u_s = 30Mbps
+Each peer has a download rate of di = 2 Mbps and un upload rate of u.
+for N = 1000 and u = 2Mbps, calculate the min distribution time for both client-server and
+P2P configs.
+
+Answer:
+
+Client-Server:
+- Server must sequentially send N file copies:
+	- Time to send one copy = F/u_s
+	- Time so send N copies = N*(F/u_s)
+
+- Each client must download the file copy:
+	- Min client download rate = d_min
+	- Min client download time = F/d_min	
+
+- F = File Size
+- u_s = File upload speed
+
+- Time to distribute F to N clients:
+	- D_cs >= max{N*(F/u_s), F/d_min}
+
+F increases linearly in N.
+
+F = 15 Gbits = 15,000 Mbits
+u_s = 30 Mbps
+di = 2 Mbps
+N = 1,000
+u = 2 Mbps
+
+Time to send N copies = 1000 * (15,000/30) = 500,000s
+Min client download time = 15,000 / 2 = 7,500
+D_cs >= max{500,000, 7,500}
+D_cs >= 500,000
+
+
+Peer-to-Peer:
+- Server must upload at least one copy:
+	- Time to send one copy = F/u_s
+
+- Each client must download the file copy:
+	- Min download time = F/d_min
+
+- As aggregate must download N*F bits:
+	- Max upload rate = u_s + sumof(ui)
+
+Time to distribute F to N client:
+D_p2p >= max{F/u_s, F/d_min, (N*F)/(u_s+sumof(ui))}
+
+F increases linearly in N, but so does sumof(ui), as each peer brings server capacity. 
+
+Time to send one copy = 15,000/30 = 500
+Min Download time = 15,000/2 = 7,500
+Max upload rate = 30 + 2000 = 2030
+
+D_p2p >= max{500, 7,500, (1000*15000)/(2030)}
+D_p2p >= max{500, 7,500, 7,389}
+D_p2p >= 7,500
+
+
+
+QUESTION 2:
+(a)
+Describe why an application developer might decide to run an application over UDP rather than 
+TCP. 
+How is a UDP socket fully identified? 
+What about a TCP socket?
+
+Answer:
+
+
+(b)
+Done elsewhere...
+
+(c)
+What do you understand about the term 'Congestion Control' in the context of a data transmission
+netwrok?
+Describe two main approaches towards congestion control.
+Outline how congestions control is managaed in aynchronous transfer mode (ATM) newtorks.
+
+Answer:
+
